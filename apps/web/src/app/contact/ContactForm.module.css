@@ -1,0 +1,133 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-08);
+}
+
+.grid {
+  display: grid;
+  gap: var(--space-07) var(--space-08);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 40rem) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-02);
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-02);
+  color: var(--foreground-02);
+  font-size: var(--font-size-03);
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  color: var(--color-brand-09);
+  font-size: 1rem;
+}
+
+.required {
+  color: var(--color-brand-09);
+}
+
+/* Underline-only fields, per the design. The transparent background keeps them readable
+   over the skyline photograph behind the section. */
+.input,
+.textarea {
+  padding: var(--space-03) 0;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  background: transparent;
+  color: var(--foreground-01);
+  font-size: var(--font-size-04);
+  transition: border-color var(--duration-fast) var(--ease-default);
+}
+
+.input:hover,
+.textarea:hover {
+  border-bottom-color: rgba(255, 255, 255, 0.6);
+}
+
+.input:focus,
+.textarea:focus {
+  border-bottom-color: var(--color-brand-09);
+  outline: none;
+}
+
+/* No focus ring on these fields (by request) — the brand-blue underline on :focus is the
+   only focus indicator. */
+.input:focus-visible,
+.textarea:focus-visible {
+  outline: none;
+}
+
+.input[aria-invalid='true'],
+.textarea[aria-invalid='true'] {
+  border-bottom-color: var(--color-error);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 6rem;
+}
+
+.error {
+  color: var(--color-error-text);
+  font-size: var(--font-size-02);
+}
+
+.formError {
+  padding: var(--space-04);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-02);
+  color: var(--color-error-text);
+  font-size: var(--font-size-03);
+}
+
+.submit {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: var(--space-04);
+  height: var(--height-xl);
+  padding-inline: var(--space-08);
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-brand-09);
+  color: var(--color-white);
+  cursor: pointer;
+  font-size: var(--font-size-05);
+  font-weight: var(--font-weight-medium);
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    opacity var(--duration-fast) var(--ease-default);
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--color-brand-10);
+}
+
+.submit:disabled {
+  cursor: progress;
+  opacity: 0.65;
+}
+
+.submitIcon {
+  font-size: 1rem;
+  transform: rotate(45deg);
+}

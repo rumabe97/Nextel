@@ -1,0 +1,92 @@
+/* The full horizontal nav needs real room; below this the MobileNav drawer takes over. */
+.nav {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .nav {
+    display: block;
+  }
+}
+
+/* Figma spaces the four items ~80px apart (measured between text edges at 1920). */
+.list {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  list-style: none;
+}
+
+@media (min-width: 80rem) {
+  .list {
+    gap: 5rem;
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+}
+
+/* Figma text style `style_3c98fda1`: Roboto Light 300, 18px, white. */
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-02);
+  color: var(--foreground-01);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-light);
+  line-height: 1.17;
+  transition: color var(--duration-fast) var(--ease-default);
+  white-space: nowrap;
+}
+
+.link:hover,
+.active {
+  color: var(--color-brand-09);
+}
+
+/* The 13×7 filled triangle beside "Servicios". */
+.caret {
+  width: 13px;
+  height: 7px;
+}
+
+/* Neutralises the DS trigger pill (32px height, 12px inline padding, hover fill) so the
+   Servicios item is indistinguishable from the plain links around it. */
+.trigger {
+  height: auto;
+  padding: 0;
+  border-radius: 0;
+}
+
+.trigger:hover:not(:disabled) {
+  background: transparent;
+}
+
+/* Hover is driven from the trigger, not the inner span: the DS trigger has its own padding
+   box, so hovering its edge would otherwise NOT recolour the label — making "Servicios"
+   feel different from the plain links beside it. The open menu keeps it lit too. */
+.trigger:hover .link,
+.trigger[data-state='open'] .link {
+  color: var(--color-brand-09);
+}
+
+/* Menu options, from Figma "Servicios 2" (#2026:1069): white 14px labels on rows that gain
+   a 6px-radius blue wash (rgba(39,147,193,.24) — EL-072c48f6) and Primary text when
+   highlighted. Doubled class beats the DS `[data-highlighted]` !important rule. */
+.menuOption {
+  min-height: 44px;
+  padding-inline: var(--space-04);
+  border-radius: var(--radius-02);
+  color: var(--foreground-01);
+  font-size: var(--font-size-03);
+  font-weight: var(--font-weight-light);
+}
+
+.menuOption.menuOption[data-highlighted],
+.menuOption.menuOption:hover:not(:disabled) {
+  background: var(--color-selected) !important;
+  color: var(--color-brand-09);
+}

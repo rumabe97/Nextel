@@ -1,0 +1,23 @@
+/* Fixed overlay, not sticky-in-flow: Figma paints the header ON TOP of the hero image.
+   Keeping it in the flow left a page-background strip above the hero — the "black gap". */
+.header {
+  position: fixed;
+  z-index: var(--z-header);
+  top: 0;
+  right: 0;
+  left: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  transition:
+    background var(--duration-normal) var(--ease-default),
+    border-color var(--duration-normal) var(--ease-default);
+}
+
+/* Scrolled state: Figma only specifies the top-of-page look, so this is the "always looks
+   good" fallback — a dark glass wash that keeps white 18px nav text readable over any
+   section that passes underneath. */
+.scrolled {
+  border-bottom-color: var(--border-01);
+  background: var(--color-glass);
+  backdrop-filter: blur(14px);
+}

@@ -1,0 +1,143 @@
+/* The footer is the one light-on-brand surface in the design: a blue gradient band with
+   white type. Tokens below are hardcoded to white rather than --foreground-01 because the
+   surface is inverted relative to the rest of the page. */
+.footer {
+  padding: var(--space-11) var(--space-06) var(--space-06);
+  background: var(--gradient-footer);
+  color: var(--color-white);
+}
+
+@media (min-width: 48rem) {
+  .footer {
+    padding-inline: var(--space-09);
+  }
+}
+
+.inner {
+  display: grid;
+  align-items: start;
+  gap: var(--space-09);
+  width: 100%;
+  max-width: var(--content-width);
+  margin-inline: auto;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 40rem) {
+  .inner {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 64rem) {
+  /* Tagline · Links · Otros · watermark — the four-column rhythm from the design. */
+  .inner {
+    grid-template-columns: 1.4fr 1fr 1fr auto;
+  }
+}
+
+.tagline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-02);
+}
+
+.taglinePrimary {
+  color: var(--color-white);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: var(--font-size-07);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-02);
+  text-transform: uppercase;
+}
+
+.taglineSecondary {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: var(--font-size-05);
+  line-height: var(--line-height-02);
+  text-transform: uppercase;
+}
+
+.email {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-03);
+  margin-top: var(--space-05);
+  padding: var(--space-02) var(--space-05);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: var(--radius-full);
+  color: var(--color-white);
+  font-size: var(--font-size-02);
+  transition: background var(--duration-fast) var(--ease-default);
+}
+
+.email:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.emailIcon {
+  font-size: 0.875rem;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-05);
+}
+
+.columnTitle {
+  color: var(--color-white);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: var(--font-size-05);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+}
+
+.columnList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-03);
+  list-style: none;
+}
+
+.columnLink {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: var(--font-size-01);
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+  transition: color var(--duration-fast) var(--ease-default);
+}
+
+.columnLink:hover {
+  color: var(--color-white);
+}
+
+/* Oversized, low-contrast N mark anchoring the right edge. Decorative only — the Logo
+   renders it via mask-image with no text, so there is nothing for a screen reader to skip. */
+.watermark {
+  display: none;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+@media (min-width: 64rem) {
+  .watermark {
+    display: block;
+    justify-self: end;
+  }
+}
+
+.copyright {
+  max-width: var(--content-width);
+  margin: var(--space-10) auto 0;
+  padding-top: var(--space-05);
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: var(--font-size-01);
+  text-align: center;
+}
+
+.copyrightBrand {
+  color: var(--color-white);
+  font-weight: var(--font-weight-semibold);
+}

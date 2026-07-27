@@ -1,0 +1,98 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-05);
+  /* The tab is inset from the card's left edge and overhangs the photo below it. */
+  margin-left: var(--space-08);
+  padding: var(--space-05) var(--space-05) var(--space-06);
+  background: var(--color-petrol);
+}
+
+/* Roboto Medium 18 (style_4047af88). */
+.title {
+  color: var(--color-white);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-03);
+}
+
+/* Ghost number: Roboto Medium 50, outline-only (stroke, no fill) — node #417:5690. */
+.index {
+  -webkit-text-stroke: 1px var(--color-white);
+  color: transparent;
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: 3.125rem;
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-01);
+}
+
+.media {
+  position: relative;
+  overflow: hidden;
+  margin-top: calc(var(--space-06) * -1);
+  aspect-ratio: 503 / 335;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--duration-slow) var(--ease-default);
+}
+
+.card:hover .image {
+  transform: scale(1.04);
+}
+
+/* Stretched link: covers the card without wrapping it, so the <h3> stays outside the
+   anchor and screen readers still announce the heading structure. */
+.link {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: var(--space-05);
+}
+
+.link:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* The label exists for assistive tech — the visual affordance is the arrow disc. */
+.linkLabel {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* 42px Primary disc with a white arrow (component "arrow" #2045:171). */
+.arrow {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-full);
+  background: var(--color-brand-09);
+  color: var(--color-white);
+  font-size: 1rem;
+  transition: background var(--duration-fast) var(--ease-default);
+}
+
+.card:hover .arrow {
+  background: var(--color-brand-10);
+}

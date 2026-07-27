@@ -1,0 +1,62 @@
+/* Ellipse #2042:685 — centre 7.6%, mid-hero. */
+.heroGlow {
+  top: 55%;
+  left: 7.6%;
+}
+
+.heroMedia {
+  position: relative;
+  overflow: hidden;
+  margin-top: var(--space-09);
+  border-radius: var(--radius-03);
+}
+
+.heroMedia img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1594 / 700;
+  object-fit: cover;
+}
+
+.pillars {
+  display: grid;
+  gap: var(--space-09);
+  width: min(100%, 46rem);
+  margin: var(--space-10) auto 0;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 40rem) {
+  .pillars {
+    gap: var(--space-10);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.pillar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-05);
+}
+
+.pillarTitle {
+  padding-bottom: var(--space-03);
+  border-bottom: 1px solid var(--border-01);
+  color: var(--foreground-01);
+  font-size: var(--font-size-03);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pillarBody {
+  color: var(--foreground-02);
+  font-size: var(--font-size-02);
+  line-height: var(--line-height-05);
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-11);
+}

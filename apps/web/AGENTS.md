@@ -4,7 +4,21 @@ Main web application. Rules here are more specific than root `AGENTS.md` — bot
 
 ---
 
-> **Status: starter shell.** Today this app only contains `src/app/layout.tsx` and `src/app/page.tsx` — no proxy, no server actions, no forms, no `core` integrations yet. The sections below describe **the patterns to follow when you add those features**, not what's already there. Don't expect to find example code matching every section; the conventions are forward-looking and meant to be applied as you build.
+> **Status: scaffolded.** The Nextel Advisors marketing site is built out — seven routes, a
+> shared `Header`/`Footer`, and one server action (`src/app/contacto/_actions/submitContact.ts`)
+> writing through `core/controllers/ContactSubmission`. Use the contact route as the worked
+> reference for the Forms and Server-actions sections below; it follows them literally.
+>
+> **No proxy.** `proxy.ts` was removed at kickoff — this site has no login surface, so a
+> Supabase session refresh on every request bought nothing. The Proxy section below is the
+> recipe for re-adding it if authentication arrives.
+>
+> **All user-facing copy is Spanish.** Code, comments and identifiers stay English.
+>
+> **Source of truth for the design** is the Figma file `dnaQwodte48movtUQnH9oX`, canvas
+> "Main site". Note that its `05_Por qué Nextel` frame was never designed — the
+> `/por-que-nextel` route is built from the "Presentación TelCo - Nextel" deck instead, so
+> don't "correct" it against that frame.
 
 ## Stack
 

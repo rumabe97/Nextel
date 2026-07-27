@@ -1,0 +1,46 @@
+.band {
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-block: var(--space-08);
+  padding-inline: clamp(1rem, 0.85vw, 1rem);
+}
+
+/* Figma #2045:220/222 (style_20553229): Roboto Bold 142 / line-height 166 (1.17), uppercase,
+   tight display tracking. The block is LEFT-aligned: line 1 starts at the page edge (x:16),
+   line 2 is indented ~125px — the "tab". Line 2 is outline-only: no fill, 1px stroke at
+   40% white. The 7.3vw slope keeps the longest line inside the viewport at every width. */
+.line {
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: clamp(1.7rem, 7.3vw, 8.875rem);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.015em;
+  line-height: 1.17;
+  text-transform: uppercase;
+  transition:
+    opacity var(--duration-slow) var(--ease-default),
+    transform 0.7s var(--ease-default);
+  white-space: nowrap;
+}
+
+.filled {
+  color: var(--foreground-01);
+  opacity: 0;
+  transform: translateX(-10%);
+}
+
+/* 125px at 142px font ≈ 0.88em — scales with the type at every breakpoint. */
+.outlined {
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.4);
+  margin-left: 0.88em;
+  color: transparent;
+  opacity: 0;
+  transform: translateX(10%);
+}
+
+.visible .filled,
+.visible .outlined {
+  opacity: 1;
+  transform: translateX(0);
+}

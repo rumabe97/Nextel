@@ -1,9 +1,113 @@
-/* Override or extend packages/ui tokens for the web app. */
-/* All base tokens (surfaces, text, borders, shadows) come from ui/styles/variables. */
-/* Add branding-specific overrides here, for example: */
+/* Nextel Advisors branding — app-level token overrides.
+   Loaded LAST in src/app/layout.tsx so these win over ui/styles/variables.
 
-/* @media (prefers-color-scheme: light) { */
-/*   :root { */
-/*     --background-01: #f8f6f2; */
-/*   } */
-/* } */
+   Values are lifted from the Figma file `dnaQwodte48movtUQnH9oX`, canvas "Main site":
+     Primary  #2793C1   Petrol  #12455B   Surface  #131313 / #161616   Secondary text  #B0B0B0
+
+   Never reference palette tokens (--color-gray-*, --color-blue-*) from this app — go
+   through the semantic layer below so packages/ui components rebrand automatically. */
+
+:root {
+  /* The design is dark-only. Pinning `color-scheme` here makes every `light-dark()`
+     primitive in ui/styles/colors.css resolve to its dark value, so DS components that
+     reference the gray scale stay coherent with the overrides below instead of flipping
+     to a light palette when the OS asks for light mode. */
+  color-scheme: dark;
+
+  /* ── Brand ramp ────────────────────────────────────────────────────────
+     A 12-step dark-mode ramp anchored on the Figma Primary at step 09, following the
+     same low→high contrast progression as the Radix scales in ui/styles/colors.css:
+     01–02 app surfaces · 03–05 component fills · 06–08 borders · 09 saturated solid ·
+     10 hover solid · 11 AA-passing accent text · 12 high-contrast text. */
+  --color-brand-01: #0b1418;
+  --color-brand-02: #0e1c22;
+  --color-brand-03: #102833;
+  --color-brand-04: #123241;
+  --color-brand-05: #143d4f;
+  --color-brand-06: #17495e;
+  --color-brand-07: #1a5a72;
+  --color-brand-08: #1e7191;
+  --color-brand-09: #2793c1; /* Figma `Primary` */
+  --color-brand-10: #37a3d1;
+  --color-brand-11: #6dc2e3;
+  --color-brand-12: #d5eef8;
+
+  /* ── Surfaces ────────────────────────────────────────────────────────── */
+  --background-01: #131313; /* page */
+  --background-02: #161616; /* raised cards */
+  --background-highlight: #1c1c1c;
+
+  /* ── Text ────────────────────────────────────────────────────────────────
+     Contrast against --background-01 (#131313):
+       --foreground-01 #ffffff → 18.9:1   --foreground-02 #b0b0b0 → 8.6:1
+     Both clear WCAG AA. --foreground-03 stays decorative-only (see ui/styles/variables). */
+  --foreground-01: #ffffff;
+  --foreground-02: #b0b0b0;
+  --foreground-03: #6f6f6f;
+  --foreground-disabled: #4a4a4a;
+
+  /* ── Borders ─────────────────────────────────────────────────────────── */
+  --border-01: #2c2c2c;
+
+  /* Section divider lines (Figma "bg" rules, e.g. #2040:603): 2px, light #D9D9D9. */
+  --color-divider: #d9d9d9;
+
+  /* ── Interactive ─────────────────────────────────────────────────────── */
+  --color-hover: rgba(255, 255, 255, 0.06);
+  --color-highlighted: rgba(39, 147, 193, 0.16);
+  --color-selected: rgba(39, 147, 193, 0.24);
+  --color-glass: rgba(19, 19, 19, 0.82);
+  --color-overlay: rgba(0, 0, 0, 0.7);
+
+  /* Accent-tinted focus ring — the default gray ring disappears on brand-blue fills.
+     Contrast against both #131313 and #2793c1 is > 3:1, so it stays visible either way. */
+  --focus-ring-color: var(--color-brand-11);
+
+  /* ── Nextel-specific tokens ──────────────────────────────────────────────
+     Not part of the DS contract — consumed only by apps/web components. */
+
+  /* Deep petrol from the brand deck; the second stop of every hero/footer gradient. */
+  --color-petrol: #12455b;
+
+  /* The warm accent Figma uses for the amber glow ellipses (rgba(237,188,90,…)). */
+  --color-glow-amber: #edbc5a;
+
+  /* Figma lays the site out on a 1296px content column inside a 1920px frame. */
+  --content-width: 1296px;
+
+  /* The sticky header sits above page content but BELOW anything it opens. Radix portals
+     dropdown menus to <body>, so the header and the menu share a stacking context — with the
+     header on --z-overlay (100) it painted over the top of its own menu. This slots between
+     --z-base (1) and --z-dropdown (10); Drawer/Dialog (100/200) and Toaster (300) still win. */
+  --z-header: 5;
+
+  /* Fixed-header height: logo (48/69px) + vertical padding. Content offsets by this via
+     main's padding-top; full-bleed heroes pull themselves back under it with a negative
+     margin of the same amount. */
+  --header-height: 88px;
+
+  /* Section rhythm, measured from 02_Home: ~50px per side → ~100px between plain blocks,
+     and a divided section doubles its top padding so the hairline gets 100px on each side
+     (Figma: content→line 100px, line→content 102px). */
+  --section-gap: clamp(2.5rem, 3.4vw, 3.25rem);
+
+  /* Eyebrow labels: Rubik Light, uppercase, 0.22em tracking (Figma `style_5a08b104`).
+     The DS weight scale starts at `regular` (400); the design's eyebrows and captions
+     are Rubik Light, so this app adds the 300 tier. */
+  --font-weight-light: 300;
+  --tracking-eyebrow: 0.22em;
+  --tracking-caption: 0.16em;
+
+  /* Display type. Figma peaks at 140px on the hero; these clamp down to mobile
+     without a media query at every call site. */
+  --font-size-display: clamp(2.75rem, 7vw, 8.75rem);
+  --font-size-h2: clamp(1.75rem, 3.6vw, 3.125rem); /* Figma H2 50 */
+  --font-size-h3: clamp(1.5rem, 2.4vw, 2rem); /* Figma H3 32 */
+  --font-size-h4: clamp(1.375rem, 2vw, 1.75rem); /* Figma H4 28 */
+
+  /* Signature gradients, reused by the footer, hero overlays and card washes. */
+  --gradient-brand: linear-gradient(135deg, #2793c1 0%, #12455b 100%);
+  /* Footer fill from Figma (fill_67f3608c) — Primary straight down into petrol. */
+  --gradient-footer: linear-gradient(180deg, #2793c1 0%, #12455b 100%);
+  --gradient-fade-dark: linear-gradient(180deg, rgba(19, 19, 19, 0) 0%, #131313 100%);
+}

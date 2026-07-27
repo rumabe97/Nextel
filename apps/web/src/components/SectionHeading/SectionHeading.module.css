@@ -1,0 +1,37 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-04);
+}
+
+.start {
+  align-items: flex-start;
+}
+
+.center {
+  align-items: center;
+  text-align: center;
+}
+
+/* The eyebrow is a flex row with a trailing arrow; centring the block has to centre that
+   row too, not just the text inside it. */
+.center .eyebrow {
+  justify-content: center;
+}
+
+.title {
+  max-width: 26ch;
+  font-size: var(--font-size-h2);
+  line-height: var(--line-height-02);
+}
+
+.center .title {
+  max-width: 32ch;
+}
+
+.lead {
+  max-width: 62ch;
+  color: var(--foreground-02);
+  font-size: var(--font-size-04);
+  line-height: var(--line-height-05);
+}

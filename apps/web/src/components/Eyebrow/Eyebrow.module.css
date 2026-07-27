@@ -1,0 +1,26 @@
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-03);
+  font-size: var(--font-size-03);
+  font-weight: var(--font-weight-light);
+  letter-spacing: var(--tracking-eyebrow);
+  line-height: var(--line-height-04);
+  text-transform: uppercase;
+}
+
+.brand {
+  color: var(--color-brand-09);
+}
+
+.light {
+  color: var(--foreground-01);
+}
+
+.arrow {
+  flex-shrink: 0;
+  width: 14px;
+  height: 7px;
+  /* The glyph in the design points down-right, not straight down. */
+  transform: rotate(-45deg);
+}

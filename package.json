@@ -1,5 +1,5 @@
 {
-  "name": "trc-template",
+  "name": "nextel",
   "private": true,
   "scripts": {
     "build": "turbo run build",

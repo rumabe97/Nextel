@@ -1,0 +1,25 @@
+.media {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+}
+
+.poster,
+.video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The video sits over the poster and fades in only once frames are actually rendering,
+   so there is never a flash of black while it buffers. */
+.video {
+  opacity: 0;
+  transition: opacity var(--duration-slow) var(--ease-default);
+}
+
+.playing {
+  opacity: 1;
+}

@@ -1,0 +1,37 @@
+.list {
+  display: grid;
+  counter-reset: challenge;
+  gap: var(--space-07) var(--space-08);
+  grid-template-columns: 1fr;
+  list-style: none;
+}
+
+@media (min-width: 40rem) {
+  .list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  padding-top: var(--space-04);
+  border-top: 1px solid var(--border-01);
+  counter-increment: challenge;
+  gap: var(--space-04);
+}
+
+.item::before {
+  color: var(--foreground-03);
+  content: counter(challenge);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: var(--font-size-09);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-01);
+}
+
+.label {
+  color: var(--foreground-02);
+  font-size: var(--font-size-03);
+  line-height: var(--line-height-05);
+}

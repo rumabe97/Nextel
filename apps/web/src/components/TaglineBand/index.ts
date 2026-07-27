@@ -1,0 +1,1 @@
+export { TaglineBand } from './TaglineBand';

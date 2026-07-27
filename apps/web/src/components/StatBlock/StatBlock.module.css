@@ -1,0 +1,29 @@
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-09);
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-03);
+}
+
+/* <dt> is a block by default and inherits nothing from the heading rules in globals.css,
+   so the display family is set explicitly here. */
+.value {
+  color: var(--foreground-01);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: clamp(2rem, 4vw, 3.75rem);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-01);
+  text-transform: uppercase;
+}
+
+.caption {
+  color: var(--foreground-02);
+  font-size: var(--font-size-01);
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+}

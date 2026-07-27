@@ -1,0 +1,40 @@
+.section {
+  position: relative;
+  padding-block: var(--section-gap);
+}
+
+.flush {
+  padding-block: 0;
+}
+
+.inner {
+  width: 100%;
+  max-width: var(--content-width);
+  margin-inline: auto;
+  padding-inline: var(--space-06);
+}
+
+@media (min-width: 48rem) {
+  .inner {
+    padding-inline: var(--space-09);
+  }
+}
+
+/* The hairline rule between blocks. It runs nearly edge-to-edge in the design, not just
+   across the content column, so it lives on the section rather than the inner wrapper. */
+/* Figma puts ~100px on EACH side of a divider: double the top padding and park the
+   line midway through it. */
+.divided {
+  padding-top: calc(var(--section-gap) * 2);
+}
+
+.divided::before {
+  position: absolute;
+  top: var(--section-gap);
+  /* Figma: 43px side insets on the 1920 artboard — nearly full-bleed. */
+  right: clamp(1.25rem, 2.25vw, 2.7rem);
+  left: clamp(1.25rem, 2.25vw, 2.7rem);
+  height: 2px;
+  background: var(--color-divider);
+  content: '';
+}

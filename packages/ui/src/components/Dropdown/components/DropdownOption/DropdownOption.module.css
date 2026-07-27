@@ -7,9 +7,13 @@
   display: flex;
   font-size: var(--font-size-02);
   gap: var(--space-02);
-  height: var(--height-m);
-  line-height: var(--line-height-01);
-  padding: 0 var(--space-02);
+  /* `min-height`, not `height`: the content box is capped at 240px, so any label longer than
+     ~30 characters wraps to a second line. With a fixed height that second line overflowed
+     the option and was painted over by the next one. Single-line options are unaffected —
+     min-height still resolves to the same 32px row. */
+  min-height: var(--height-m);
+  line-height: var(--line-height-03);
+  padding: var(--space-01) var(--space-02);
   position: relative;
   user-select: none;
 }

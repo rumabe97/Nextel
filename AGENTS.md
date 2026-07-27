@@ -1,6 +1,11 @@
-# Mini Template AGENTS.md
+# Nextel Advisors AGENTS.md
 
 Agent-focused guidance for this monorepo. The closest `AGENTS.md` to the file you edit wins.
+
+**Product context:** Nextel Advisors is a Spanish-language telecom consultancy site — consultoría,
+intermediación y captación comercial. Two service lines: _Contratación de nueva planta_ (site
+acquisition) and _Site Management_. **All user-facing copy is in Spanish**; code, comments, and
+identifiers stay in English.
 
 ---
 
@@ -37,13 +42,9 @@ Agent-focused guidance for this monorepo. The closest `AGENTS.md` to the file yo
 
 ```
 apps/
-  web/    — main web app (Next.js, port 3000)
-  docs/   — design system docs / custom Storybook (Next.js, port 3001)
-  cli/    — developer CLI (Commander.js + tsx)
+  web/    — the Nextel Advisors site (Next.js, port 3000)
 packages/
   core/     — business logic: entities, repositories, controllers
-  database/ — Drizzle ORM client, schemas, migrations
-  auth/     — Supabase auth helpers (client, server, middleware)
   ui/       — shared React component library
 configurations/
   eslint/       — shared ESLint configs
@@ -54,12 +55,14 @@ configurations/
 ## Dependency chain
 
 ```
-apps/*  →  core  →  database  →  [drizzle-orm, postgres, auth]
-apps/*  →  ui
-apps/*  →  auth
+apps/web  →  core  →  [zod]
+apps/web  →  ui
 ```
 
-Apps never import from `database` directly — all data access goes through `packages/core`.
+There is NO database and NO auth in this project. The contact form (the only dynamic
+feature) validates in `core` and emails each submission through the Resend REST API —
+see `packages/core/src/repositories/ContactEmail/`. All external I/O stays in core
+repositories; apps only import controllers.
 
 ## Absolute imports
 
@@ -70,8 +73,6 @@ Two patterns coexist in this repo, depending on whether you're inside an app or 
 Apps define their own internal aliases via `tsconfig.json` `paths`. There is no `baseUrl`, no `@` prefix.
 
 - `apps/web`: `components/*`, `hooks/*`, `lib/*`, `styles/*`
-- `apps/docs`: `components/*`, `lib/*`, `styles/*`
-- `apps/cli`: `commands/*`
 
 Each app's `tsconfig.json` `paths` block is the source of truth — these examples may lag behind reality. When in doubt, read the app's tsconfig.
 
@@ -86,7 +87,7 @@ import { Header } from '../components/Header'; // ❌ wrong — use absolute
 The `ui` package does **not** define `paths` aliases. Instead, it consumes itself through its own `package.json` `exports` field — the same mechanism apps use to import from it:
 
 ```ts
-import { Button } from 'ui/components/Button';        // ✅ from any app, AND from inside packages/ui
+import { Button } from 'ui/components/Button'; // ✅ from apps/web, AND from inside packages/ui
 import { useComposedRefs } from 'ui/hooks/useComposedRefs';
 import type { Size } from 'ui/types/Sizes.types';
 ```
@@ -100,8 +101,8 @@ One consistent rule for all consumers — including the package itself. See [`pa
 See [`packages/core/AGENTS.md`](./packages/core/AGENTS.md) for the full rules. Short version:
 
 - **entities/** — Zod schemas + derived types. Data shapes only, no logic.
-- **repositories/** — static objects. Call `database()` per method. Wrap I/O in try/catch.
-- **controllers/** — static objects. Business rules + presenters. No try/catch, no DB access.
+- **repositories/** — static objects. All external I/O (e.g. the Resend API). Wrap I/O in try/catch, throw domain errors.
+- **controllers/** — static objects. Business rules + validation. No direct I/O.
 - Apps import only from `core/controllers/*`. Never from `core/repositories/*` except for types.
 
 ---
@@ -170,9 +171,11 @@ Four-file token system. **Never hardcode colors, sizes, or shadows — always us
 
 No utility class frameworks (no Tailwind). Module CSS only.
 
-### Branding a new project
+### Branding
 
-To remap the visual language for a new project, override tokens in `apps/your-app/src/styles/variables.css`:
+**This project's brand tokens live in [`apps/web/src/styles/variables.css`](./apps/web/src/styles/variables.css)** — the Nextel palette (Primary `#2793C1`, petrol `#12455B`, `#131313` surfaces), the dark-only `color-scheme`, the type scale, and app-specific extras (`--color-petrol`, `--content-width`, `--section-gap`, `--tracking-eyebrow`, the gradients). Fonts are wired in `apps/web/src/lib/fonts.ts` (Roboto for headings via `--font-heading`, Rubik for body via `--main-font`).
+
+Change branding there, never in `packages/ui`. The generic mechanism:
 
 ```css
 /* Change brand accent from blue to green */

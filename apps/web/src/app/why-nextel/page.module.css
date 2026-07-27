@@ -1,0 +1,114 @@
+/* Figma 05: blue #417:6475 centre 7.7%, amber #417:6483 centre 79.6%. */
+.headerGlowBlue {
+  top: 70%;
+  left: 7.7%;
+}
+
+.headerGlowAmber {
+  top: 80%;
+  left: 79.6%;
+}
+
+/* Ellipse #417:6476 — centre 92.6%, top of the page. */
+.headerGlowTop {
+  top: 2rem;
+  left: 92.6%;
+}
+
+.reasons {
+  display: grid;
+  counter-reset: reason;
+  gap: var(--space-09) var(--space-10);
+  grid-template-columns: 1fr;
+  list-style: none;
+}
+
+@media (min-width: 48rem) {
+  .reasons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.reason {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-04);
+  padding-top: var(--space-05);
+  border-top: 1px solid var(--border-01);
+  counter-increment: reason;
+}
+
+/* Ghosted two-digit index above each pillar, matching the "01 / 02" treatment the service
+   cards use. `counter` keeps the numbering tied to document order. */
+.reason::before {
+  color: var(--foreground-03);
+  content: '0' counter(reason);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: var(--font-size-07);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-01);
+}
+
+.reasonTitle {
+  color: var(--foreground-01);
+  font-size: var(--font-size-h4);
+  line-height: var(--line-height-02);
+}
+
+.reasonBody {
+  max-width: 52ch;
+  color: var(--foreground-02);
+  font-size: var(--font-size-03);
+  line-height: var(--line-height-05);
+}
+
+.commitments {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-09);
+}
+
+.cta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-06);
+}
+
+@media (min-width: 48rem) {
+  .cta {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.ctaTitle {
+  color: var(--foreground-01);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-02);
+}
+
+.ctaLink {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-03);
+  padding: var(--space-04) var(--space-07);
+  border-radius: var(--radius-full);
+  background: var(--color-brand-09);
+  color: var(--color-white);
+  font-size: var(--font-size-03);
+  font-weight: var(--font-weight-medium);
+  transition: background var(--duration-fast) var(--ease-default);
+}
+
+.ctaLink:hover {
+  background: var(--color-brand-10);
+}
+
+.ctaIcon {
+  font-size: 0.875rem;
+}

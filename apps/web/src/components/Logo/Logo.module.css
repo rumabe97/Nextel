@@ -1,0 +1,18 @@
+/* Figma's header lockup is 163×69. Width follows from the aspect ratio so callers only
+   ever set a height. */
+.lockup {
+  width: auto;
+  height: 69px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.mark {
+  display: block;
+  flex-shrink: 0;
+  background-color: currentColor;
+  mask-image: url('/logo-nextel.svg');
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}

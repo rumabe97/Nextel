@@ -1,0 +1,91 @@
+.trigger {
+  display: grid;
+  place-items: center;
+  width: var(--height-l);
+  height: var(--height-l);
+  border: 1px solid var(--border-01);
+  border-radius: var(--radius-02);
+  background: transparent;
+  color: var(--foreground-01);
+  cursor: pointer;
+  font-size: 1.25rem;
+}
+
+/* Mirror of HeaderNav's breakpoint: exactly one of the two is ever visible. */
+@media (min-width: 64rem) {
+  .trigger {
+    display: none;
+  }
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-08);
+  padding: var(--space-06) var(--space-06) var(--space-09);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-05);
+  list-style: none;
+}
+
+.link {
+  display: block;
+  color: var(--foreground-01);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: var(--font-size-07);
+  font-weight: var(--font-weight-bold);
+}
+
+.active {
+  color: var(--color-brand-09);
+}
+
+.subList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-02);
+  margin-top: var(--space-03);
+  padding-left: var(--space-04);
+  border-left: 1px solid var(--border-01);
+  list-style: none;
+}
+
+.subLink {
+  color: var(--foreground-02);
+  font-size: var(--font-size-03);
+}
+
+.subLink:hover {
+  color: var(--color-brand-09);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-04);
+  padding-top: var(--space-06);
+  border-top: 1px solid var(--border-01);
+}
+
+.email {
+  color: var(--color-brand-09);
+  font-size: var(--font-size-04);
+}
+
+.legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-04);
+  list-style: none;
+}
+
+.legalLink {
+  color: var(--foreground-02);
+  font-size: var(--font-size-02);
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+}

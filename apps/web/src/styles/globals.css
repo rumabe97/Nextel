@@ -1,3 +1,78 @@
 /* App-specific global styles.
-   The shared reset (box-sizing, body defaults, font-family) lives in ui/styles/base.
-   Add only what is unique to this app here. */
+   The shared reset (box-sizing, body defaults, font-family) lives in ui/styles/base. */
+
+/* Headings run in Roboto Bold per the Figma type scale; body stays on Rubik, which
+   ui/styles/base.css already wires to --main-font. Setting this globally means page
+   markup can use plain <h1>/<h2> without every component re-declaring the family. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading), var(--font-fallback);
+  font-weight: var(--font-weight-bold);
+}
+
+/* The design anchors on a dark page with light type; make that the document default so
+   there is no white flash before the first paint. */
+html {
+  background: var(--background-01);
+}
+
+/* The shared reset paints body with --background-01 too — opaque, and body's background
+   paints ABOVE negative-z descendants, which would hide every page glow. html owns the
+   page colour; body must stay transparent. */
+body {
+  background: transparent;
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --header-height: 117px;
+  }
+}
+
+/* The header is a fixed overlay; regular pages start below it. Full-bleed heroes opt back
+   under it with `margin-top: calc(var(--header-height) * -1)`. */
+main {
+  padding-top: var(--header-height);
+}
+
+/* Anchor-scrolled sections must clear the fixed header. */
+:target {
+  scroll-margin-top: calc(var(--header-height) + var(--space-06));
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Screen-reader-only content (visually hidden, still announced). */
+.visuallyHidden {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Skip link — the header nav is long, and every page repeats it. */
+.skipLink {
+  position: absolute;
+  z-index: var(--z-tooltip);
+  top: var(--space-04);
+  left: var(--space-04);
+  padding: var(--space-03) var(--space-05);
+  border-radius: var(--radius-full);
+  background: var(--color-brand-09);
+  color: var(--color-white);
+  font-size: var(--font-size-03);
+  transform: translateY(-200%);
+  transition: transform var(--duration-fast) var(--ease-default);
+}
+
+.skipLink:focus-visible {
+  transform: translateY(0);
+}

@@ -1,0 +1,109 @@
+.section {
+  position: relative;
+  overflow: hidden;
+  /* Full-bleed skyline: cancel main's header offset so it runs up behind the fixed header. */
+  margin-top: calc(var(--header-height) * -1);
+  padding-block: var(--section-gap);
+  padding-top: calc(var(--section-gap) + var(--header-height));
+  isolation: isolate;
+}
+
+.background {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+}
+
+/* The skyline is atmosphere, not content: it has to sit far enough back that white form
+   labels and a 1px underline stay legible across the whole photo. */
+.overlay {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(19, 19, 19, 0.92) 0%, rgba(18, 69, 91, 0.78) 55%, rgba(19, 19, 19, 0.9) 100%);
+}
+
+/* Ellipse #2002:1505 — centre 92.6%, hugging the top edge. Stays above the skyline
+   overlay (same z, later in DOM) but under all content. */
+.cornerGlow {
+  z-index: -1;
+  top: 9rem;
+  left: 92.6%;
+}
+
+.inner {
+  display: grid;
+  align-items: start;
+  gap: var(--space-10);
+  width: 100%;
+  max-width: var(--content-width);
+  margin-inline: auto;
+  padding-inline: var(--space-06);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 48rem) {
+  .cornerGlow {
+    z-index: -1;
+    top: -6rem;
+    right: -8rem;
+  }
+
+  .inner {
+    padding-inline: var(--space-09);
+  }
+}
+
+@media (min-width: 64rem) {
+  .cornerGlow {
+    z-index: -1;
+    top: -6rem;
+    right: -8rem;
+  }
+
+  .inner {
+    grid-template-columns: 0.8fr 1.2fr;
+  }
+}
+
+.aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-02);
+}
+
+.taglinePrimary {
+  margin-top: var(--space-04);
+  color: var(--foreground-01);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: var(--font-size-07);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-02);
+  text-transform: uppercase;
+}
+
+.taglineSecondary {
+  color: var(--foreground-02);
+  font-size: var(--font-size-05);
+  line-height: var(--line-height-02);
+  text-transform: uppercase;
+}
+
+.formColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-07);
+}
+
+.title {
+  padding-bottom: var(--space-05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  color: var(--color-brand-09);
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: var(--line-height-01);
+  text-transform: uppercase;
+}
