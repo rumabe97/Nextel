@@ -1,6 +1,8 @@
 import { PageSection } from 'components/PageSection';
 import { SectionHeading } from 'components/SectionHeading';
 
+import { getContactEmail } from 'lib/contactEmail';
+
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -11,12 +13,14 @@ export const metadata: Metadata = {
 };
 
 export default function PoliticaDePrivacidadPage() {
+  const contactEmail = getContactEmail();
+
   return (
     <PageSection>
       <SectionHeading
         as="h1"
         eyebrow="Legal"
-        lead="Estamos preparando este contenido. Si necesitas información sobre el tratamiento de tus datos, escríbenos a info@nextel.com."
+        lead={`Estamos preparando este contenido. Si necesitas información sobre el tratamiento de tus datos, escríbenos a ${contactEmail}.`}
       >
         Política de privacidad
       </SectionHeading>

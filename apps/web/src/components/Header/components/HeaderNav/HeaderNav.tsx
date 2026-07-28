@@ -9,18 +9,32 @@ import { Link } from 'ui/components/Link';
 
 import { Icon } from 'components/Icon';
 
-import { NAV_ITEMS } from 'lib/navigation';
+import { isActivePath, isSamePageTopLink, NAV_ITEMS } from 'lib/navigation';
+
+import type { MouseEvent } from 'react';
 
 // Client because it reads the current route to mark the active link. `aria-current` does
 // the announcing; the brand-blue styling is just the visual half of the same signal.
 export function HeaderNav() {
   const pathname = usePathname();
 
+  // Only the Servicios menu needs this here: HeaderShell delegates the same behaviour for
+  // everything rendered inside the <header>, but the menu is portalled out of it so its
+  // clicks never reach that handler. Re-selecting the current page is a no-op for the
+  // router, which would otherwise leave a scrolled-down visitor exactly where they were.
+  function handleSamePageClick(event: MouseEvent<HTMLElement>) {
+    const anchor = event.target instanceof Element ? event.target.closest('a') : null;
+
+    if (anchor && isSamePageTopLink(anchor.getAttribute('href') ?? '', pathname)) {
+      window.scrollTo({ top: 0 });
+    }
+  }
+
   return (
     <nav aria-label="Navegación principal" className={styles.nav}>
       <ul className={styles.list}>
         {NAV_ITEMS.map(item => {
-          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const isActive = isActivePath(pathname, item.href);
 
           if (item.children) {
             return (
@@ -30,7 +44,11 @@ export function HeaderNav() {
                   aria-label={`${item.label} — abrir submenú`}
                   label={
                     <span className={isActive ? `${styles.link} ${styles.active}` : styles.link}>
-                      {item.label}
+                      {/* data-text feeds the hidden bold copy that reserves this label's
+                          widest width — see .label in the stylesheet. */}
+                      <span className={styles.label} data-text={item.label}>
+                        {item.label}
+                      </span>
                       <Icon className={styles.caret} name="caretDown" />
                     </span>
                   }
@@ -49,7 +67,9 @@ export function HeaderNav() {
                   {/* The parent route is reachable from inside the menu too: the trigger
                       opens the dropdown rather than navigating, so without this entry
                       /services would have no link anywhere in the header. */}
-                  <DropdownOption asChild={true} className={styles.menuOption}>
+                  {/* The menu is portalled out of this <nav>, so its clicks never reach the
+                      delegated handler above — it needs its own. */}
+                  <DropdownOption asChild={true} className={styles.menuOption} onClick={handleSamePageClick}>
                     <Link href={item.href}>Ver todos los servicios</Link>
                   </DropdownOption>
                   {item.children.map(child => (
@@ -69,7 +89,9 @@ export function HeaderNav() {
                 className={isActive ? `${styles.link} ${styles.active}` : styles.link}
                 href={item.href}
               >
-                {item.label}
+                <span className={styles.label} data-text={item.label}>
+                  {item.label}
+                </span>
               </Link>
             </li>
           );

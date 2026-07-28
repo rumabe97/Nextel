@@ -38,13 +38,44 @@
   font-size: 1.125rem;
   font-weight: var(--font-weight-light);
   line-height: 1.17;
-  transition: color var(--duration-fast) var(--ease-default);
+  transition:
+    color var(--duration-fast) var(--ease-default),
+    transform var(--duration-normal) var(--ease-default);
   white-space: nowrap;
 }
 
+/* Figma marks the current page by swapping the item to `style_a9c9fa87` — Roboto Bold 700
+   on Primary — against the Light 300 white of the rest (see the state pair at #2026:677 /
+   #2026:660, and each page frame's own header: About lights "Sobre Nosotros", Contact
+   lights "Contacto"). Hover uses that same treatment.
+   The weight jump is what reads as the item growing. It cannot be tweened — this Roboto is
+   five static cuts, not a variable font — so the scale carries the motion and keeps the
+   gesture smooth rather than snapping. */
 .link:hover,
 .active {
   color: var(--color-brand-09);
+  font-weight: var(--font-weight-bold);
+}
+
+.link:hover {
+  transform: scale(1.05);
+}
+
+/* Reserving the bold width up front: a zero-height copy of the label that is always bold
+   makes the item as wide as its heaviest state, so the 300→700 swap cannot nudge the
+   items beside it. Without this the whole row jitters on every hover. */
+.label {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.label::after {
+  overflow: hidden;
+  height: 0;
+  content: attr(data-text);
+  font-weight: var(--font-weight-bold);
+  visibility: hidden;
 }
 
 /* The 13×7 filled triangle beside "Servicios". */
@@ -53,16 +84,29 @@
   height: 7px;
 }
 
-/* Neutralises the DS trigger pill (32px height, 12px inline padding, hover fill) so the
-   Servicios item is indistinguishable from the plain links around it. */
-.trigger {
+/* Neutralises the DS trigger pill (32px height, 12px inline padding, full radius, hover
+   fill) so the Servicios item is indistinguishable from the plain links around it.
+   The class is doubled deliberately: `ui/components/Dropdown`'s own `.trigger` rules have
+   identical specificity and its stylesheet is emitted after this one, so a single class
+   silently lost every one of these declarations — Servicios really was rendering as a 32px
+   pill with 12px padding and a hover wash while its neighbours were bare 21px text. */
+.trigger.trigger {
   height: auto;
   padding: 0;
   border-radius: 0;
 }
 
-.trigger:hover:not(:disabled) {
+.trigger.trigger:hover:not(:disabled) {
   background: transparent;
+}
+
+/* The DS trigger wraps `label` in a span of its own carrying `overflow: hidden` and
+   `max-width: 20ch`. As a flex item of the inline-flex trigger that span is blockified, so
+   both actually apply — and they cropped "Servicios" the moment the hover scale pushed it
+   past the box. Targeting it as a child beats the DS's single-class rule. */
+.trigger > span {
+  overflow: visible;
+  max-width: none;
 }
 
 /* Hover is driven from the trigger, not the inner span: the DS trigger has its own padding
@@ -71,6 +115,8 @@
 .trigger:hover .link,
 .trigger[data-state='open'] .link {
   color: var(--color-brand-09);
+  font-weight: var(--font-weight-bold);
+  transform: scale(1.05);
 }
 
 /* Menu options, from Figma "Servicios 2" (#2026:1069): white 14px labels on rows that gain

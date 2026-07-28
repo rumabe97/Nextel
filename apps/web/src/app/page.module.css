@@ -290,10 +290,25 @@
 .bandSection {
   position: relative;
   padding-block: calc(var(--section-gap) * 1.5);
+  isolation: isolate;
+}
+
+/* The dot texture is Figma's own fill (imageRef 216e21d5…), pixel-for-pixel — mean alpha
+   16/255, which is barely there. Figma gets away with that because its dot rectangle is
+   1107px tall and overlaps the lit section above it, so the wave reads across a large,
+   slightly brighter surface. Our band is roughly half that height and sits on flat
+   #131313, where `background-size: cover` centre-crops the wave and the same pixels
+   vanish. Giving the texture its own layer lets it be lifted to the visibility it has in
+   the design without the filter touching the type painted over it. */
+.bandSection::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
   background-image: url('/images/dots-band.webp');
   background-position: center;
   background-size: cover;
-  isolation: isolate;
+  content: '';
+  filter: brightness(2.2);
 }
 
 /* Ellipse #2045:240 — centre just off the left edge (-2%). z-0 lifts it above the

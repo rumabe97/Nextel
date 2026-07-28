@@ -74,9 +74,35 @@ describe('ContactEmailRepository', () => {
   });
 
   it('throws DatabaseOperationError when Resend rejects the message', async () => {
-    fetchMock.mockResolvedValueOnce({ ok: false, status: 422 });
+    fetchMock.mockResolvedValueOnce({ ok: false, status: 422, text: async () => '' });
 
     await expect(ContactEmailRepository.send(makeContactSubmission())).rejects.toThrow(DatabaseOperationError);
+  });
+
+  // The three below cover failures that only ever show up on a deployed site: the local
+  // .env is hand-edited, the hosted one is pasted into a dashboard.
+  it("carries Resend's own explanation into the error, so a rejection is diagnosable from logs", async () => {
+    fetchMock.mockResolvedValueOnce({ ok: false, status: 403, text: async () => 'The domain is not verified' });
+
+    await expect(ContactEmailRepository.send(makeContactSubmission())).rejects.toThrow(/The domain is not verified/);
+  });
+
+  it('names the variables that are missing rather than listing all three', async () => {
+    vi.stubEnv('CONTACT_EMAIL_FROM', '');
+
+    await expect(ContactEmailRepository.send(makeContactSubmission())).rejects.toThrow(/missing: CONTACT_EMAIL_FROM$/);
+  });
+
+  it('trims env values so a pasted trailing newline cannot corrupt the auth header', async () => {
+    vi.stubEnv('RESEND_API_KEY', 're_test_key\n');
+    vi.stubEnv('CONTACT_EMAIL_TO', ' inbox@nextel.com ');
+    fetchMock.mockResolvedValueOnce({ ok: true, status: 200 });
+
+    await ContactEmailRepository.send(makeContactSubmission());
+
+    const [, options] = fetchMock.mock.calls[0] as [string, { body: string; headers: Record<string, string> }];
+    expect(options.headers.Authorization).toBe('Bearer re_test_key');
+    expect(JSON.parse(options.body)).toMatchObject({ to: 'inbox@nextel.com' });
   });
 
   it('throws DatabaseOperationError when the network call itself fails', async () => {

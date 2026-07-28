@@ -33,8 +33,15 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
   return (
     // data-scroll-behavior tells Next the smooth scrolling in globals.css is intentional,
     // so it can suppress it during route transitions (and its dev warning).
-    <html data-scroll-behavior="smooth" lang="es">
-      <body className={`${body.variable} ${heading.variable}`}>
+    //
+    // suppressHydrationWarning on these two elements only: browser extensions (dark-mode
+    // themers in particular) rewrite <html>/<body> attributes before React hydrates, which
+    // React reports as a mismatch it "won't patch up". Both elements render deterministic,
+    // static attributes here, so there is no real mismatch this can mask — and the flag
+    // covers just the element it sits on, never its subtree, so every component below is
+    // still checked normally.
+    <html data-scroll-behavior="smooth" lang="es" suppressHydrationWarning={true}>
+      <body className={`${body.variable} ${heading.variable}`} suppressHydrationWarning={true}>
         <a className="skipLink" href="#contenido">
           Saltar al contenido
         </a>

@@ -1,14 +1,23 @@
+/* Bare glyph, no chip: Figma's header is a logo lockup and plain type, so a bordered box
+   would be the only framed element on the page. The negative inline margin cancels the
+   button's own padding so the icon's ink — not its hit area — lines up with the header's
+   right inset, mirroring the logo on the left. The padding still gives a 48px target. */
 .trigger {
   display: grid;
-  place-items: center;
-  width: var(--height-l);
-  height: var(--height-l);
-  border: 1px solid var(--border-01);
-  border-radius: var(--radius-02);
+  margin-right: calc(var(--space-03) * -1);
+  padding: var(--space-03);
+  border: none;
   background: transparent;
   color: var(--foreground-01);
   cursor: pointer;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
+  place-items: center;
+  transition: color var(--duration-fast) var(--ease-default);
+}
+
+.trigger:hover,
+.trigger[data-state='open'] {
+  color: var(--color-brand-09);
 }
 
 /* Mirror of HeaderNav's breakpoint: exactly one of the two is ever visible. */
@@ -18,74 +27,182 @@
   }
 }
 
+/* ── Drawer body ──────────────────────────────────────────────────────── */
+
+/* No inline padding of its own — the drawer already pads its content box, so the rows line
+   up with the sheet's own "Menú" title instead of floating in from a second inset.
+   min-height:0 lets this flex child actually shrink so the list scrolls on short screens
+   rather than pushing the contact block out of the sheet. */
+/* overflow-x is pinned to hidden because overflow-y:auto alone would compute the other axis
+   to auto too, turning the few pixels a hover effect moves into a real horizontal scrollbar. */
 .nav {
   display: flex;
+  overflow-x: hidden;
+  overflow-y: auto;
   flex-direction: column;
-  gap: var(--space-08);
-  padding: var(--space-06) var(--space-06) var(--space-09);
+  min-height: 0;
+  /* The sheet is bottom-anchored, so the last row would otherwise sit under the iPhone
+     home indicator. */
+  padding-bottom: max(var(--space-02), env(safe-area-inset-bottom));
+  gap: var(--space-06);
+  overscroll-behavior: contain;
+}
+
+/* The same Primary-fading-right hairline that opens the home page's intro and every value
+   statement — it is what makes the panel read as part of this site. */
+.nav::before {
+  flex-shrink: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-brand-09) 0%, transparent 70%);
+  content: '';
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-05);
   list-style: none;
 }
 
-.link {
-  display: block;
-  color: var(--foreground-01);
-  font-family: var(--font-heading), var(--font-fallback);
-  font-size: var(--font-size-07);
-  font-weight: var(--font-weight-bold);
+.item + .item {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Roboto Medium rows with a trailing arrow: full-width tap targets with real structure,
+   rather than headings stacked in space. */
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: var(--space-04);
+  gap: var(--space-04);
+  color: var(--foreground-01);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: var(--font-size-06);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-02);
+  transition: color var(--duration-fast) var(--ease-default);
+}
+
+.linkIcon {
+  flex-shrink: 0;
+  color: var(--color-brand-09);
+  font-size: 0.7em;
+  opacity: 0.5;
+  transition: opacity var(--duration-fast) var(--ease-default);
+}
+
+/* The arrow sits flush against the sheet's inner edge, so nudging it outward on hover was
+   what produced the horizontal scroll. The growth happens on the label instead, anchored at
+   its left edge so it expands into the empty middle of the row and never reaches an edge. */
+.linkLabel {
+  transform-origin: left center;
+  transition: transform var(--duration-normal) var(--ease-default);
+}
+
+.link:hover {
+  color: var(--color-brand-09);
+}
+
+.link:hover .linkLabel {
+  transform: scale(1.04);
+}
+
+.link:hover .linkIcon {
+  opacity: 1;
+}
+
+/* Current page: brand colour plus a fully lit arrow. Deliberately no edge-bleeding bar or
+   wash — those need negative margins, which this scroll container would clip. */
 .active {
   color: var(--color-brand-09);
+}
+
+.active .linkIcon {
+  opacity: 1;
 }
 
 .subList {
   display: flex;
   flex-direction: column;
-  gap: var(--space-02);
-  margin-top: var(--space-03);
-  padding-left: var(--space-04);
-  border-left: 1px solid var(--border-01);
+  margin-bottom: var(--space-04);
+  gap: var(--space-01);
   list-style: none;
 }
 
 .subLink {
+  display: flex;
+  align-items: baseline;
+  padding-block: var(--space-02);
+  gap: var(--space-03);
   color: var(--foreground-02);
-  font-size: var(--font-size-03);
+  font-size: var(--font-size-04);
+  transition: color var(--duration-fast) var(--ease-default);
 }
 
 .subLink:hover {
-  color: var(--color-brand-09);
+  color: var(--foreground-01);
 }
+
+/* 01 / 02, matching the service cards on the home page. */
+.subIndex {
+  color: var(--color-brand-09);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: var(--font-size-01);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-caption);
+}
+
+/* ── Contact block ────────────────────────────────────────────────────── */
 
 .meta {
   display: flex;
   flex-direction: column;
-  gap: var(--space-04);
+  align-items: flex-start;
   padding-top: var(--space-06);
-  border-top: 1px solid var(--border-01);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  gap: var(--space-03);
+}
+
+/* The site's eyebrow treatment: Rubik Light, uppercase, wide tracking. */
+.metaLabel {
+  color: var(--foreground-02);
+  font-size: var(--font-size-01);
+  font-weight: var(--font-weight-light);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
 }
 
 .email {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-02);
   color: var(--color-brand-09);
-  font-size: var(--font-size-04);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: var(--font-size-05);
+  font-weight: var(--font-weight-medium);
+}
+
+.emailIcon {
+  font-size: 0.7em;
 }
 
 .legal {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-04);
+  margin-top: var(--space-02);
+  gap: var(--space-02) var(--space-05);
   list-style: none;
 }
 
 .legalLink {
   color: var(--foreground-02);
-  font-size: var(--font-size-02);
+  font-size: var(--font-size-01);
   letter-spacing: var(--tracking-caption);
   text-transform: uppercase;
+  transition: color var(--duration-fast) var(--ease-default);
+}
+
+.legalLink:hover {
+  color: var(--foreground-01);
 }

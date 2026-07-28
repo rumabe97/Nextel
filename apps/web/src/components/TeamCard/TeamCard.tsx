@@ -12,8 +12,9 @@ export interface TeamMember {
   name: string;
   /** Portrait URL. Omit and the DS Avatar renders its seeded MarbleEffect fallback. */
   photo?: string;
-  /** Job title, e.g. "General Manager". */
-  role: string;
+  /** Job title, e.g. "General Manager". Optional so a confirmed colleague can ship without
+   *  one — a guessed title on a real person's card is worse than no title. */
+  role?: string;
 }
 
 export interface TeamCardProps {
@@ -29,7 +30,7 @@ export function TeamCard({ member }: TeamCardProps) {
       <Avatar className={styles.avatar} name={member.name} size={220} src={member.photo} />
 
       <h3 className={styles.name}>{member.name}</h3>
-      <p className={styles.role}>{member.role}</p>
+      {member.role ? <p className={styles.role}>{member.role}</p> : null}
 
       <ul className={styles.social}>
         {member.linkedin ? (
@@ -48,7 +49,10 @@ export function TeamCard({ member }: TeamCardProps) {
         ) : null}
         {member.email ? (
           <li>
-            <a aria-label={`Escribir a ${member.name}`} className={styles.socialLink} href={`mailto:${member.email}`}>
+            {/* `title` puts the address in the hover tooltip. The icon carries no visible
+                text, and a `mailto:` link does nothing at all in a browser with no mail
+                handler registered, so without this there is no way to read the address. */}
+            <a aria-label={`Escribir a ${member.name}`} className={styles.socialLink} href={`mailto:${member.email}`} title={member.email}>
               <Icon name="mail" />
             </a>
           </li>

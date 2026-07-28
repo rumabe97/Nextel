@@ -1,5 +1,9 @@
+/* Full height + the social row pushed to the bottom: `role` is optional, so cards with and
+   without a title would otherwise end at different heights and leave the icons stepping up
+   and down across the row. */
 .card {
   display: flex;
+  height: 100%;
   flex-direction: column;
   align-items: center;
   gap: var(--space-03);
@@ -23,11 +27,14 @@
   font-size: var(--font-size-02);
 }
 
+/* margin-top:auto pins the icon row to the bottom of the card: `role` is optional, so
+   without it a card that has no title ends short and the icons step up and down the row. */
 .social {
   display: flex;
   align-items: center;
+  margin-top: auto;
   gap: var(--space-04);
-  margin-top: var(--space-02);
+  padding-top: var(--space-03);
   list-style: none;
 }
 

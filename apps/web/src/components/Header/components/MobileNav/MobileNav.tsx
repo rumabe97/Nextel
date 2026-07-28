@@ -10,11 +10,16 @@ import { Link } from 'ui/components/Link';
 
 import { Icon } from 'components/Icon';
 
-import { CONTACT_EMAIL, FOOTER_LEGAL, NAV_ITEMS } from 'lib/navigation';
+import { FOOTER_LEGAL, isActivePath, isSamePageTopLink, NAV_ITEMS } from 'lib/navigation';
 
 import type { MouseEvent } from 'react';
 
-export function MobileNav() {
+export interface MobileNavProps {
+  /** Resolved by the server-rendered Header — a Client Component cannot read the env var. */
+  contactEmail: string;
+}
+
+export function MobileNav({ contactEmail }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -26,9 +31,22 @@ export function MobileNav() {
   // Handling it here rather than in an effect on `pathname` is deliberate — calling
   // setState synchronously in an effect triggers a cascading render, which the React
   // Compiler lint (`react-hooks/set-state-in-effect`) flags for good reason.
+  // Element, not HTMLElement: every row ends in an inline <svg> arrow, so a tap landing on
+  // the arrow reports an SVGElement — which fails an HTMLElement check, leaving the drawer
+  // open over the page it just navigated to. `closest` is defined on Element.
   function handleNavClick(event: MouseEvent<HTMLElement>) {
-    if (event.target instanceof HTMLElement && event.target.closest('a')) {
-      setOpen(false);
+    const anchor = event.target instanceof Element ? event.target.closest('a') : null;
+
+    if (!anchor) {
+      return;
+    }
+
+    setOpen(false);
+
+    // Re-selecting the page you are already on: the router has nothing to do, so without
+    // this the drawer just closes and the page stays wherever it was scrolled to.
+    if (isSamePageTopLink(anchor.getAttribute('href') ?? '', pathname)) {
+      window.scrollTo({ top: 0 });
     }
   }
 
@@ -49,23 +67,26 @@ export function MobileNav() {
       <nav aria-label="Navegación principal" className={styles.nav} onClick={handleNavClick}>
         <ul className={styles.list}>
           {NAV_ITEMS.map(item => {
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const isActive = isActivePath(pathname, item.href);
 
             return (
-              <li key={item.href}>
+              <li className={styles.item} key={item.href}>
                 <Link
                   aria-current={isActive ? 'page' : undefined}
                   className={isActive ? `${styles.link} ${styles.active}` : styles.link}
                   href={item.href}
                 >
-                  {item.label}
+                  <span className={styles.linkLabel}>{item.label}</span>
+                  <Icon className={styles.linkIcon} name="arrowRight" />
                 </Link>
 
                 {item.children ? (
                   <ul className={styles.subList}>
-                    {item.children.map(child => (
+                    {item.children.map((child, index) => (
                       <li key={child.href}>
                         <Link className={styles.subLink} href={child.href}>
+                          {/* Same 01/02 numbering the service cards use on the home page. */}
+                          <span className={styles.subIndex}>{String(index + 1).padStart(2, '0')}</span>
                           {child.label}
                         </Link>
                       </li>
@@ -78,9 +99,12 @@ export function MobileNav() {
         </ul>
 
         <div className={styles.meta}>
-          <a className={styles.email} href={`mailto:${CONTACT_EMAIL}`}>
-            {CONTACT_EMAIL}
+          <p className={styles.metaLabel}>Escríbenos</p>
+          <a className={styles.email} href={`mailto:${contactEmail}`}>
+            {contactEmail}
+            <Icon className={styles.emailIcon} name="arrowUpRight" />
           </a>
+
           <ul className={styles.legal}>
             {FOOTER_LEGAL.map(legal => (
               <li key={legal.href}>

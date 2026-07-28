@@ -25,7 +25,7 @@ cp apps/web/.env.example apps/web/.env
 | Variable             | Used for                                          |
 | -------------------- | ------------------------------------------------- |
 | `RESEND_API_KEY`     | Resend secret key                                 |
-| `CONTACT_EMAIL_TO`   | Inbox that receives contact submissions           |
+| `CONTACT_EMAIL_TO`   | Inbox for submissions — also shown publicly       |
 | `CONTACT_EMAIL_FROM` | Verified sender, e.g. `Nextel <web@nextel.com>`   |
 
 ## What's inside?

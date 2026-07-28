@@ -23,10 +23,13 @@ export const metadata: Metadata = {
   title: 'Sobre Nosotros'
 };
 
-// Figma's team grid repeats one placeholder card three times. Only the General Manager is
-// named in the deck, so that is the single entry here — add colleagues as they are
-// confirmed rather than shipping filler names.
-const TEAM: TeamMember[] = [{ name: 'Rubén Garrido', role: 'General Manager' }];
+// Roster as supplied by the client on 28 Jul 2026. `role` is optional on TeamMember so a
+// confirmed colleague can ship without a title rather than carry a guessed one.
+const TEAM: TeamMember[] = [
+  { email: 'Alejandro.serrano@nexteladv.es', name: 'Alejandro Serrano', role: 'General Manager' },
+  { email: 'Ruben.garrido@nexteladv.es', name: 'Rubén Garrido', role: 'General Manager' },
+  { email: 'Jorge.fernandez@nexteladv.es', name: 'Jorge Fernández', role: 'General Manager' }
+];
 
 // Slide 4 of the deck, "¿Por qué existimos?".
 const CHALLENGES = [

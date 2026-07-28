@@ -5,9 +5,12 @@ import { Link } from 'ui/components/Link';
 import { Icon } from 'components/Icon';
 import { Logo } from 'components/Logo';
 
-import { CONTACT_EMAIL, FOOTER_LEGAL, FOOTER_LINKS } from 'lib/navigation';
+import { FOOTER_LEGAL, FOOTER_LINKS } from 'lib/navigation';
+import { getContactEmail } from 'lib/contactEmail';
 
 export function Footer() {
+  const contactEmail = getContactEmail();
+
   return (
     <footer className={styles.footer}>
       <div className={styles.inner}>
@@ -15,8 +18,8 @@ export function Footer() {
           <p className={styles.taglinePrimary}>Conectamos hoy</p>
           <p className={styles.taglineSecondary}>Impulsamos el mañana</p>
 
-          <a className={styles.email} href={`mailto:${CONTACT_EMAIL}`}>
-            {CONTACT_EMAIL}
+          <a className={styles.email} href={`mailto:${contactEmail}`}>
+            {contactEmail}
             <Icon className={styles.emailIcon} name="arrowUpRight" />
           </a>
         </div>
