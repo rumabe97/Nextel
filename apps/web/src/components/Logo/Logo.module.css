@@ -7,9 +7,14 @@
   object-fit: contain;
 }
 
+/* Width follows the height through the source art's own ratio, so a caller that scales the
+   mark from CSS never has to restate it. */
 .mark {
   display: block;
+  width: auto;
+  height: 34px;
   flex-shrink: 0;
+  aspect-ratio: 1844 / 2884;
   background-color: currentColor;
   mask-image: url('/logo-nextel.svg');
   mask-position: center;

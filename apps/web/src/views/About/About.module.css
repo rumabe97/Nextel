@@ -1,0 +1,261 @@
+/* ── Hero ─────────────────────────────────────────────────────────────── */
+
+/* Ellipse #2019:448 — centre 7.7%, mid-hero. */
+.heroGlow {
+  top: 45%;
+  left: 7.7%;
+}
+
+/* Ellipse #2019:455 — centre 92.6%, top of the page. */
+.heroGlowRight {
+  top: 4rem;
+  left: 92.6%;
+}
+
+.heroMedia {
+  position: relative;
+  overflow: hidden;
+  margin-top: var(--space-09);
+  border-radius: var(--radius-03);
+}
+
+.heroMedia img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1720 / 780;
+  object-fit: cover;
+}
+
+/* ── Intro ────────────────────────────────────────────────────────────── */
+
+.intro {
+  display: grid;
+  align-items: center;
+  gap: var(--space-09);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 64rem) {
+  .intro {
+    grid-template-columns: 1.4fr 1fr;
+  }
+}
+
+.introBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-06);
+}
+
+.introTitle {
+  max-width: 16ch;
+  font-size: var(--font-size-h2);
+  line-height: var(--line-height-02);
+}
+
+.introNote {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-03);
+  max-width: 56ch;
+  padding-left: var(--space-04);
+  border-left: 2px solid var(--color-brand-09);
+  color: var(--foreground-02);
+  font-size: var(--font-size-03);
+  line-height: var(--line-height-05);
+}
+
+.stats {
+  margin-top: var(--space-04);
+}
+
+/* Decorative only: an aria-hidden span with no text, so whether it renders has no bearing
+   on SEO or on assistive tech — it is pure ornament.
+   Below the two-column breakpoint there is nowhere for it to go. Laying it over the copy
+   hurt legibility, and stacking it under the stats read as a stray logo someone forgot to
+   remove. So it does not render until the layout actually has a column to give it, which is
+   the honest responsive answer for ornament.
+   Doubled class on purpose: `.mark` in the Logo stylesheet sets `display: block` at the same
+   specificity, and which file wins on source order is not something to leave to chance. */
+.introMark.introMark {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .introMark.introMark {
+    display: block;
+    /* Scales with its column rather than sitting at a fixed 280px, so it stays proportionate
+       from the breakpoint up to the widest desktop. */
+    height: clamp(12rem, 17vw, 19rem);
+    color: rgba(255, 255, 255, 0.1);
+    justify-self: center;
+  }
+}
+
+/* ── Mission ──────────────────────────────────────────────────────────── */
+
+.mission {
+  display: grid;
+  align-items: center;
+  gap: var(--space-09);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 64rem) {
+  .mission {
+    gap: var(--space-11);
+    grid-template-columns: 0.85fr 1.15fr;
+  }
+}
+
+/* The design masks these photos into circles. */
+.missionMedia {
+  overflow: hidden;
+  width: min(100%, 24rem);
+  margin-inline: auto;
+  border-radius: var(--radius-full);
+  aspect-ratio: 1;
+}
+
+.missionImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.missionBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-05);
+}
+
+.missionTitle {
+  max-width: 18ch;
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-02);
+}
+
+.missionGrid {
+  display: grid;
+  gap: var(--space-07);
+  margin-top: var(--space-05);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 40rem) {
+  .missionGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.missionCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-04);
+}
+
+.missionCardTitle {
+  padding-bottom: var(--space-03);
+  border-bottom: 1px solid var(--border-01);
+  color: var(--foreground-01);
+  font-size: var(--font-size-03);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.missionCardBody {
+  color: var(--foreground-02);
+  font-size: var(--font-size-02);
+  line-height: var(--line-height-05);
+}
+
+/* ── Team ─────────────────────────────────────────────────────────────── */
+
+.team {
+  display: grid;
+  justify-content: center;
+  gap: var(--space-09);
+  margin-top: var(--space-10);
+  /* auto-fit rather than a fixed 3-up: the roster currently has one member, and a hardcoded
+     three columns would leave two empty cells and push the card off-centre. */
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 18rem));
+  list-style: none;
+}
+
+/* ── Rotating banner ──────────────────────────────────────────────────── */
+
+/* Ellipses #2019:456 (amber, centre 51%) and #2019:449 (blue, centre 89%). */
+.bannerGlowAmber {
+  top: 10%;
+  left: 51%;
+}
+
+.bannerGlowBlue {
+  top: 80%;
+  left: 89%;
+}
+
+.banner {
+  max-width: 24ch;
+  color: var(--foreground-01);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: clamp(2rem, 5.5vw, 4.5rem);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-02);
+}
+
+/* ── Challenges ───────────────────────────────────────────────────────── */
+
+.challenges {
+  display: grid;
+  align-items: center;
+  gap: var(--space-09);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 64rem) {
+  .challenges {
+    gap: var(--space-10);
+    grid-template-columns: 1.25fr 0.75fr;
+  }
+}
+
+.challengesBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-05);
+}
+
+.challengesTitle {
+  max-width: 34ch;
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-02);
+}
+
+.challengesList {
+  margin-top: var(--space-04);
+}
+
+.challengesClosing {
+  max-width: 52ch;
+  margin-top: var(--space-04);
+  color: var(--foreground-01);
+  font-size: var(--font-size-04);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-04);
+}
+
+.challengesMedia {
+  overflow: hidden;
+  width: min(100%, 26rem);
+  margin-inline: auto;
+  border-radius: var(--radius-full);
+  aspect-ratio: 1;
+}
+
+.challengesImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

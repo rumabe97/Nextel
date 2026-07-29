@@ -1,7 +1,6 @@
-import type { MetadataRoute } from 'next';
+import { BASE_URL } from 'lib/siteUrl';
 
-// TODO: set the production domain when it exists; relative sitemap URLs are invalid.
-const BASE_URL = 'https://nextel.com';
+import type { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
   return { rules: { allow: '/', userAgent: '*' }, sitemap: `${BASE_URL}/sitemap.xml` };

@@ -28,13 +28,15 @@ export interface LogoProps {
 // The source art is a 7KB auto-traced path, so inlining the SVG would ship that on every page.
 export function Logo({ className, size, variant = 'lockup' }: LogoProps) {
   if (variant === 'mark') {
-    const height = size ?? 34;
-
     return (
       <span
         aria-hidden={true}
         className={[styles.mark, className].filter(Boolean).join(' ')}
-        style={{ height: `${height}px`, width: `${(height * 1844) / 2884}px` }}
+        // Only pin the size when a caller asks for a specific one. Left unset, the `.mark`
+        // class owns the height and the aspect ratio keeps the width in step, so consumers
+        // can scale the mark responsively from CSS — an inline style would win over any
+        // media query.
+        style={size === undefined ? undefined : { height: `${size}px`, width: `${(size * 1844) / 2884}px` }}
       />
     );
   }

@@ -8,7 +8,12 @@ import styles from './TaglineBand.module.css';
 // lines from off-canvas (x:-1206 / x:1595, opacity 0) to rest — i.e. a scroll-triggered
 // slide-in, line 1 from the left, line 2 from the right. An IntersectionObserver arms it
 // once; prefers-reduced-motion collapses the transition globally (ui/styles/base).
-export function TaglineBand() {
+export interface TaglineBandProps {
+  primary: string;
+  secondary: string;
+}
+
+export function TaglineBand({ primary, secondary }: TaglineBandProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -38,8 +43,8 @@ export function TaglineBand() {
     // Decorative restatement of the brand line — the page's h1 already carries it for
     // assistive tech, so this stays out of the a11y tree.
     <div aria-hidden={true} className={visible ? `${styles.band} ${styles.visible}` : styles.band} ref={ref}>
-      <p className={`${styles.line} ${styles.filled}`}>Conectamos hoy</p>
-      <p className={`${styles.line} ${styles.outlined}`}>Impulsamos el mañana</p>
+      <p className={`${styles.line} ${styles.filled}`}>{primary}</p>
+      <p className={`${styles.line} ${styles.outlined}`}>{secondary}</p>
     </div>
   );
 }

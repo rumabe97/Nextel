@@ -1,0 +1,85 @@
+/* One measured column. Legal text is read, not scanned, so the line length is capped well
+   below the site's content width and the rhythm is looser than a marketing block. */
+.document {
+  width: min(46rem, 100%);
+  margin-inline: auto;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-04);
+  padding-bottom: var(--space-08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.title {
+  font-size: var(--font-size-h2);
+  line-height: var(--line-height-02);
+}
+
+.updated {
+  color: var(--foreground-02);
+  font-size: var(--font-size-02);
+  letter-spacing: var(--tracking-caption);
+  text-transform: uppercase;
+}
+
+.intro {
+  color: var(--foreground-01);
+  font-size: var(--font-size-05);
+  line-height: var(--line-height-05);
+}
+
+.section {
+  margin-top: var(--space-09);
+}
+
+/* Roboto Bold, keyed by the brand rule the rest of the site uses to open a block. */
+.sectionTitle {
+  margin-bottom: var(--space-05);
+  padding-left: var(--space-04);
+  border-left: 3px solid var(--color-brand-09);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: var(--font-size-06);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-03);
+}
+
+.paragraph {
+  color: var(--foreground-02);
+  font-size: var(--font-size-04);
+  line-height: var(--line-height-05);
+}
+
+.paragraph + .paragraph {
+  margin-top: var(--space-04);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-04);
+  gap: var(--space-03);
+  list-style: none;
+}
+
+/* Brand-blue marker instead of a browser bullet, matching the check lists elsewhere. */
+.listItem {
+  position: relative;
+  padding-left: var(--space-05);
+  color: var(--foreground-02);
+  font-size: var(--font-size-04);
+  line-height: var(--line-height-05);
+}
+
+.listItem::before {
+  position: absolute;
+  top: 0.65em;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-brand-09);
+  content: '';
+}

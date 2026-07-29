@@ -9,10 +9,14 @@ import { Drawer } from 'ui/components/Drawer';
 import { Link } from 'ui/components/Link';
 
 import { Icon } from 'components/Icon';
+import { LanguageSwitcher } from 'components/LanguageSwitcher';
 
-import { FOOTER_LEGAL, isActivePath, isSamePageTopLink, NAV_ITEMS } from 'lib/navigation';
+import { isActivePath, isSamePageTopLink } from 'lib/navigation';
 
+import type { Dictionary } from 'i18n/dictionaries/es';
+import type { Locale } from 'i18n/config';
 import type { MouseEvent } from 'react';
+import type { NavItem } from 'lib/navigation';
 
 /**
  * Long enough to outlast the sheet's close animation and the scroll restore vaul performs
@@ -23,9 +27,12 @@ const DRAWER_SETTLE_MS = 450;
 export interface MobileNavProps {
   /** Resolved by the server-rendered Header — a Client Component cannot read the env var. */
   contactEmail: string;
+  dictionary: Dictionary;
+  items: NavItem[];
+  locale: Locale;
 }
 
-export function MobileNav({ contactEmail }: MobileNavProps) {
+export function MobileNav({ contactEmail, dictionary, items, locale }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -85,9 +92,9 @@ export function MobileNav({ contactEmail }: MobileNavProps) {
     <Drawer
       onOpenChange={setOpen}
       open={open}
-      title="Menú"
+      title={dictionary.common.menuTitle}
       trigger={
-        <button aria-label="Abrir menú" className={styles.trigger} type="button">
+        <button aria-label={dictionary.common.openMenu} className={styles.trigger} type="button">
           <Icon name="menu" />
         </button>
       }
@@ -95,10 +102,10 @@ export function MobileNav({ contactEmail }: MobileNavProps) {
       {/* The onClick here is delegation, not an interactive affordance: every focusable
           child is a real anchor with its own keyboard handling, so there is no keyboard
           equivalent to add. */}
-      <nav aria-label="Navegación principal" className={styles.nav} onClick={handleNavClick}>
+      <nav aria-label={dictionary.common.mainNav} className={styles.nav} onClick={handleNavClick}>
         <ul className={styles.list}>
-          {NAV_ITEMS.map(item => {
-            const isActive = isActivePath(pathname, item.href);
+          {items.map(item => {
+            const isActive = isActivePath(pathname, item.href, locale);
 
             return (
               <li className={styles.item} key={item.href}>
@@ -130,21 +137,13 @@ export function MobileNav({ contactEmail }: MobileNavProps) {
         </ul>
 
         <div className={styles.meta}>
-          <p className={styles.metaLabel}>Escríbenos</p>
+          <p className={styles.metaLabel}>{dictionary.common.writeUs}</p>
           <a className={styles.email} href={`mailto:${contactEmail}`}>
             {contactEmail}
             <Icon className={styles.emailIcon} name="arrowUpRight" />
           </a>
 
-          <ul className={styles.legal}>
-            {FOOTER_LEGAL.map(legal => (
-              <li key={legal.href}>
-                <Link className={styles.legalLink} href={legal.href}>
-                  {legal.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <LanguageSwitcher languageNames={dictionary.languageNames} legend={dictionary.common.language} locale={locale} variant="drawer" />
         </div>
       </nav>
     </Drawer>

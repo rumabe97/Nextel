@@ -9,13 +9,22 @@ import { Link } from 'ui/components/Link';
 
 import { Icon } from 'components/Icon';
 
-import { isActivePath, isSamePageTopLink, NAV_ITEMS } from 'lib/navigation';
+import { isActivePath, isSamePageTopLink } from 'lib/navigation';
 
+import type { Dictionary } from 'i18n/dictionaries/es';
+import type { Locale } from 'i18n/config';
 import type { MouseEvent } from 'react';
+import type { NavItem } from 'lib/navigation';
 
 // Client because it reads the current route to mark the active link. `aria-current` does
 // the announcing; the brand-blue styling is just the visual half of the same signal.
-export function HeaderNav() {
+export interface HeaderNavProps {
+  dictionary: Dictionary;
+  items: NavItem[];
+  locale: Locale;
+}
+
+export function HeaderNav({ dictionary, items, locale }: HeaderNavProps) {
   const pathname = usePathname();
 
   // Only the Servicios menu needs this here: HeaderShell delegates the same behaviour for
@@ -31,17 +40,17 @@ export function HeaderNav() {
   }
 
   return (
-    <nav aria-label="Navegación principal" className={styles.nav}>
+    <nav aria-label={dictionary.common.mainNav} className={styles.nav}>
       <ul className={styles.list}>
-        {NAV_ITEMS.map(item => {
-          const isActive = isActivePath(pathname, item.href);
+        {items.map(item => {
+          const isActive = isActivePath(pathname, item.href, locale);
 
           if (item.children) {
             return (
               <li className={styles.item} key={item.href}>
                 <Dropdown
                   align="start"
-                  aria-label={`${item.label} — abrir submenú`}
+                  aria-label={item.label}
                   label={
                     <span className={isActive ? `${styles.link} ${styles.active}` : styles.link}>
                       {/* data-text feeds the hidden bold copy that reserves this label's
@@ -70,7 +79,7 @@ export function HeaderNav() {
                   {/* The menu is portalled out of this <nav>, so its clicks never reach the
                       delegated handler above — it needs its own. */}
                   <DropdownOption asChild={true} className={styles.menuOption} onClick={handleSamePageClick}>
-                    <Link href={item.href}>Ver todos los servicios</Link>
+                    <Link href={item.href}>{dictionary.serviceMenu.all}</Link>
                   </DropdownOption>
                   {item.children.map(child => (
                     <DropdownOption asChild={true} className={styles.menuOption} key={child.href}>

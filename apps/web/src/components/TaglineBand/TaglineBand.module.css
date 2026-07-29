@@ -4,7 +4,16 @@
   flex-direction: column;
   align-items: flex-start;
   padding-block: var(--space-08);
-  padding-inline: clamp(1rem, 0.85vw, 1rem);
+  /* Figma runs this band almost edge to edge (x:16 of 1920), which is fine at desktop but
+     left the type almost touching the screen edge on a phone. Comfortable inset by default,
+     tightening to the design's own value once there is room for it. */
+  padding-inline: var(--space-06);
+}
+
+@media (min-width: 64rem) {
+  .band {
+    padding-inline: max(1rem, 0.85vw);
+  }
 }
 
 /* Figma #2045:220/222 (style_20553229): Roboto Bold 142 / line-height 166 (1.17), uppercase,
@@ -13,7 +22,12 @@
    40% white. The 7.3vw slope keeps the longest line inside the viewport at every width. */
 .line {
   font-family: var(--font-heading), var(--font-fallback);
-  font-size: clamp(1.7rem, 7.3vw, 8.875rem);
+  /* Figma draws this at 142px on a 1920 board — 7.4vw. That does not actually fit: the
+     longer of the two phrases ("IMPULSAMOS EL MAÑANA") runs about 14x the font size once its
+     indent is counted, so at 7.3vw it ran ~70px past the viewport at 1440 and `overflow:
+     hidden` quietly cut the end off. 6.8vw is the widest slope where the full phrase still
+     lands inside the screen at every desktop width, in both languages. */
+  font-size: clamp(1.7rem, 6.8vw, 8.875rem);
   font-weight: var(--font-weight-bold);
   letter-spacing: -0.015em;
   line-height: 1.17;
@@ -22,6 +36,20 @@
     opacity var(--duration-slow) var(--ease-default),
     transform 0.7s var(--ease-default);
   white-space: nowrap;
+}
+
+/* 7.3vw matches Figma at desktop, but the longest line ("IMPULSAMOS EL MAÑANA") is ~13x the
+   font size, so at phone widths that slope pushed it past the viewport and `overflow: hidden`
+   simply cut it off. A gentler slope below the breakpoint keeps the whole phrase on screen —
+   measured against the Spanish string, which is the longer of the two languages. */
+@media (max-width: 48rem) {
+  .line {
+    font-size: clamp(1rem, 5.6vw, 2.7rem);
+  }
+
+  .outlined {
+    margin-left: 0.5em;
+  }
 }
 
 .filled {

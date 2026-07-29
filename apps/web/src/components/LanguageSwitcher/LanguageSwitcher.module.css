@@ -1,0 +1,47 @@
+/* A two-item segmented control. The separator is drawn between the options rather than
+   around them, so the control reads as one object without a boxed chip — the header has no
+   other framed element. */
+.group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-03);
+}
+
+.option {
+  color: var(--foreground-02);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-light);
+  letter-spacing: var(--tracking-caption);
+  line-height: 1.17;
+  text-transform: uppercase;
+  transition: color var(--duration-fast) var(--ease-default);
+}
+
+.option:hover {
+  color: var(--foreground-01);
+}
+
+/* Same emphasis Figma gives the current nav item: Roboto Bold on Primary. */
+.active {
+  color: var(--color-brand-09);
+  font-weight: var(--font-weight-bold);
+}
+
+.option + .option {
+  padding-left: var(--space-03);
+  border-left: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* Inside the drawer it sits under the contact block, sized like the legal row above it. */
+.drawer {
+  gap: var(--space-04);
+}
+
+.drawer .option {
+  font-size: var(--font-size-03);
+}
+
+.drawer .option + .option {
+  padding-left: var(--space-04);
+}

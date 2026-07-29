@@ -113,16 +113,22 @@
   color: var(--color-white);
 }
 
-/* Oversized, low-contrast N mark anchoring the right edge. Decorative only — the Logo
-   renders it via mask-image with no text, so there is nothing for a screen reader to skip. */
-.watermark {
+/* Low-contrast N anchoring the right edge. Decorative only — the Logo renders it via
+   mask-image with no text, so there is nothing for a screen reader to skip and nothing for a
+   crawler to lose when it is hidden.
+   Doubled class on purpose: `.mark` in the Logo stylesheet sets `display: block` at the same
+   specificity, and which file wins on source order is not something to leave to chance. */
+.watermark.watermark {
   display: none;
-  color: rgba(255, 255, 255, 0.35);
 }
 
+/* Only once the footer is four columns wide is there a column for it to sit in. Below that
+   it would either land under the legal links as a stray mark or crowd the columns. */
 @media (min-width: 64rem) {
-  .watermark {
+  .watermark.watermark {
     display: block;
+    height: clamp(5.5rem, 8vw, 8rem);
+    color: rgba(255, 255, 255, 0.16);
     justify-self: end;
   }
 }

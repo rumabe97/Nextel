@@ -51,13 +51,13 @@ describe('ContactSubmissionController', () => {
       const promise = ContactSubmissionController.submit({ ...validInput, email: 'not-an-email' });
 
       await expect(promise).rejects.toThrow(InputParseError);
-      await expect(promise).rejects.toMatchObject({ fieldErrors: { email: ['Introduce un correo electrónico válido.'] } });
+      await expect(promise).rejects.toMatchObject({ fieldErrors: { email: ['email.invalid'] } });
       expect(repo.send).not.toHaveBeenCalled();
     });
 
     it('throws InputParseError when the message is too short', async () => {
       await expect(ContactSubmissionController.submit({ ...validInput, message: 'Hola' })).rejects.toMatchObject({
-        fieldErrors: { message: ['Cuéntanos algo más — al menos 10 caracteres.'] }
+        fieldErrors: { message: ['message.min'] }
       });
     });
 

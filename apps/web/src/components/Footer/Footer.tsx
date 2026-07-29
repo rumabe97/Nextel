@@ -5,18 +5,26 @@ import { Link } from 'ui/components/Link';
 import { Icon } from 'components/Icon';
 import { Logo } from 'components/Logo';
 
-import { FOOTER_LEGAL, FOOTER_LINKS } from 'lib/navigation';
+import { buildFooterLinks, buildLegalLinks } from 'lib/navigation';
 import { getContactEmail } from 'lib/contactEmail';
 
-export function Footer() {
+import type { Dictionary } from 'i18n/dictionaries/es';
+import type { Locale } from 'i18n/config';
+
+export interface FooterProps {
+  dictionary: Dictionary;
+  locale: Locale;
+}
+
+export function Footer({ dictionary, locale }: FooterProps) {
   const contactEmail = getContactEmail();
 
   return (
     <footer className={styles.footer}>
       <div className={styles.inner}>
         <div className={styles.tagline}>
-          <p className={styles.taglinePrimary}>Conectamos hoy</p>
-          <p className={styles.taglineSecondary}>Impulsamos el mañana</p>
+          <p className={styles.taglinePrimary}>{dictionary.footer.taglinePrimary}</p>
+          <p className={styles.taglineSecondary}>{dictionary.footer.taglineSecondary}</p>
 
           <a className={styles.email} href={`mailto:${contactEmail}`}>
             {contactEmail}
@@ -26,10 +34,10 @@ export function Footer() {
 
         <nav aria-labelledby="footer-links" className={styles.column}>
           <h2 className={styles.columnTitle} id="footer-links">
-            Links
+            {dictionary.footer.links}
           </h2>
           <ul className={styles.columnList}>
-            {FOOTER_LINKS.map(link => (
+            {buildFooterLinks(locale, dictionary).map(link => (
               <li key={link.href}>
                 <Link className={styles.columnLink} href={link.href}>
                   {link.label}
@@ -41,10 +49,10 @@ export function Footer() {
 
         <nav aria-labelledby="footer-legal" className={styles.column}>
           <h2 className={styles.columnTitle} id="footer-legal">
-            Otros
+            {dictionary.footer.other}
           </h2>
           <ul className={styles.columnList}>
-            {FOOTER_LEGAL.map(link => (
+            {buildLegalLinks(locale, dictionary).map(link => (
               <li key={link.href}>
                 <Link className={styles.columnLink} href={link.href}>
                   {link.label}
@@ -54,11 +62,11 @@ export function Footer() {
           </ul>
         </nav>
 
-        <Logo className={styles.watermark} size={128} variant="mark" />
+        <Logo className={styles.watermark} variant="mark" />
       </div>
 
       <p className={styles.copyright}>
-        ©{new Date().getFullYear()} <strong className={styles.copyrightBrand}>Nextel Advisors</strong> Todos los derechos reservados
+        ©{new Date().getFullYear()} <strong className={styles.copyrightBrand}>Nextel Advisors</strong> {dictionary.footer.rights}
       </p>
     </footer>
   );
