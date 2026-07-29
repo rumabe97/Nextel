@@ -1,46 +1,21 @@
+/* Card proportions come straight from Figma's group "01" (#417:5678): 503.49 x 401.39. */
 .card {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  aspect-ratio: 503.49 / 401.39;
+  isolation: isolate;
 }
 
-.tab {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-05);
-  /* The tab is inset from the card's left edge and overhangs the photo below it. */
-  margin-left: var(--space-08);
-  padding: var(--space-05) var(--space-05) var(--space-06);
-  background: var(--color-petrol);
-}
-
-/* Roboto Medium 18 (style_4047af88). */
-.title {
-  color: var(--color-white);
-  font-family: var(--font-heading), var(--font-fallback);
-  font-size: 1.125rem;
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-03);
-}
-
-/* Ghost number: Roboto Medium 50, outline-only (stroke, no fill) — node #417:5690. */
-.index {
-  -webkit-text-stroke: 1px var(--color-white);
-  color: transparent;
-  font-family: var(--font-heading), var(--font-fallback);
-  font-size: 3.125rem;
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-01);
-}
-
+/* The photo does NOT start at the card's top. Figma's mask group (#2040:629) sits at
+   y122.12 and is 279.27 tall, so the image occupies the lower 69.6% of the card and the
+   petrol panel — which starts at y0 — juts 122px above it. Filling the card with the image
+   made the panel's top edge line up with the photo's, which is not the design. */
 .media {
-  position: relative;
+  position: absolute;
+  top: 30.42%;
+  right: 0;
+  left: 0;
   overflow: hidden;
-  margin-top: calc(var(--space-06) * -1);
-  aspect-ratio: 503 / 335;
+  height: 69.58%;
 }
 
 .image {
@@ -54,14 +29,79 @@
   transform: scale(1.04);
 }
 
+/* The petrol panel over the photo's top-right: x157 y0, 326.32 x 178.17 of the card, so
+   31.2% from the left, 64.8% wide and 44.4% tall. `overflow: visible` matters — the arrow
+   disc is a child and has to hang past the bottom edge. */
+.panel {
+  position: absolute;
+  top: 0;
+  left: 31.18%;
+  width: 64.81%;
+  height: 44.39%;
+  background: var(--color-petrol);
+}
+
+/* Ghosted number, top-right of the panel: outline only, Roboto Medium 50 (#417:5690).
+   Its right edge sits 8px inside the panel — 2.45% of the panel's width. */
+.index {
+  position: absolute;
+  top: 10.3%;
+  right: 2.45%;
+  -webkit-text-stroke: 1px var(--color-white);
+  color: transparent;
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: clamp(2rem, 4vw, 3.125rem);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-01);
+}
+
+/* Title centred under the number: Roboto Medium 18 (style_4047af88), spanning x36.04 to
+   x272.27 of the 326.32 panel. */
+.title {
+  position: absolute;
+  top: 44.9%;
+  left: 11%;
+  width: 72.4%;
+  color: var(--color-white);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: clamp(0.875rem, 1.4vw, 1.125rem);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-03);
+  text-align: center;
+}
+
+/* 42px Primary disc, half of it hanging below the panel (panel ends y178.17, disc ends
+   y199.19). Positioned from the panel: x253.24 of 326.32 across, y157.15 of 178.17 down. */
+.arrow {
+  position: absolute;
+  top: 88.2%;
+  left: 77.6%;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-full);
+  background: var(--color-brand-09);
+  color: var(--color-white);
+  place-items: center;
+  transition: background var(--duration-fast) var(--ease-default);
+}
+
+/* The glyph fills 15/24 of the icon box, so 1.3rem puts its drawn width at Figma's 13.01px.
+   Rotated: the design points it up and to the right rather than straight across. */
+.arrowIcon {
+  font-size: 1.3rem;
+  transform: rotate(-45deg);
+}
+
+.card:hover .arrow {
+  background: var(--color-brand-10);
+}
+
 /* Stretched link: covers the card without wrapping it, so the <h3> stays outside the
-   anchor and screen readers still announce the heading structure.
-   The disc is placed, not aligned to a corner: Figma puts it at x 410.24 / y 157.15 of a
-   503.49 x 401.39 card (component #2045:171), i.e. 81.5% across and 39.2% down. Pinning it
-   to flex-end instead had it sitting at 92% / 90% — bottom-right, well under the copy,
-   rather than beside the middle of the image. */
+   anchor and screen readers still announce the heading structure. */
 .link {
   position: absolute;
+  z-index: 1;
   inset: 0;
 }
 
@@ -78,26 +118,4 @@
   height: 1px;
   clip-path: inset(50%);
   white-space: nowrap;
-}
-
-/* 42px Primary disc with a white arrow (component "arrow" #2045:171). */
-.arrow {
-  position: absolute;
-  top: 39.2%;
-  left: 81.5%;
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  border-radius: var(--radius-full);
-  background: var(--color-brand-09);
-  color: var(--color-white);
-  /* The glyph fills 15/24 of the icon box, so 1.3rem puts its drawn width at Figma's
-     13.01px inside the 42px circle. */
-  font-size: 1.3rem;
-  transition: background var(--duration-fast) var(--ease-default);
-}
-
-.card:hover .arrow {
-  background: var(--color-brand-10);
 }
