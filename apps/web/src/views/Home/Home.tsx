@@ -88,7 +88,7 @@ export function Home({ dictionary, locale }: HomeProps) {
       </PageSection>
 
       <PageSection>
-        <SectionHeading align="center" eyebrow={home.services.eyebrow}>
+        <SectionHeading align="center" eyebrow={home.services.eyebrow} stackedEyebrow={true}>
           {home.services.heading}
         </SectionHeading>
 

@@ -17,10 +17,9 @@
   color: var(--foreground-01);
 }
 
+/* The asset's own 16x14. No rotation: the exported arrow already points down-right. */
 .arrow {
+  width: 16px;
+  height: 14px;
   flex-shrink: 0;
-  width: 14px;
-  height: 7px;
-  /* The glyph in the design points down-right, not straight down. */
-  transform: rotate(-45deg);
 }

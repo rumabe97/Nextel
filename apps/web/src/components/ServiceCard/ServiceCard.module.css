@@ -55,14 +55,14 @@
 }
 
 /* Stretched link: covers the card without wrapping it, so the <h3> stays outside the
-   anchor and screen readers still announce the heading structure. */
+   anchor and screen readers still announce the heading structure.
+   The disc is placed, not aligned to a corner: Figma puts it at x 410.24 / y 157.15 of a
+   503.49 x 401.39 card (component #2045:171), i.e. 81.5% across and 39.2% down. Pinning it
+   to flex-end instead had it sitting at 92% / 90% — bottom-right, well under the copy,
+   rather than beside the middle of the image. */
 .link {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding: var(--space-05);
 }
 
 .link:focus-visible {
@@ -82,6 +82,9 @@
 
 /* 42px Primary disc with a white arrow (component "arrow" #2045:171). */
 .arrow {
+  position: absolute;
+  top: 39.2%;
+  left: 81.5%;
   display: grid;
   place-items: center;
   width: 42px;
@@ -89,7 +92,9 @@
   border-radius: var(--radius-full);
   background: var(--color-brand-09);
   color: var(--color-white);
-  font-size: 1rem;
+  /* The glyph fills 15/24 of the icon box, so 1.3rem puts its drawn width at Figma's
+     13.01px inside the 42px circle. */
+  font-size: 1.3rem;
   transition: background var(--duration-fast) var(--ease-default);
 }
 

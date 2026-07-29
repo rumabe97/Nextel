@@ -15,11 +15,14 @@ export interface SectionHeadingProps {
   eyebrow?: string;
   /** Supporting paragraph below the title. */
   lead?: ReactNode;
+  /** Drops the eyebrow's arrow onto its own row beneath the kicker, as Figma's home
+   *  "Nuestros servicios" block does. Every other block keeps it inline. */
+  stackedEyebrow?: boolean;
 }
 
-export function SectionHeading({ align = 'start', as: Heading = 'h2', children, className, eyebrow, lead }: SectionHeadingProps) {
+export function SectionHeading({ align = 'start', as: Heading = 'h2', children, className, eyebrow, lead, stackedEyebrow }: SectionHeadingProps) {
   return (
-    <div className={[styles.root, styles[align], className].filter(Boolean).join(' ')}>
+    <div className={[styles.root, styles[align], stackedEyebrow ? styles.stackedEyebrow : undefined, className].filter(Boolean).join(' ')}>
       {eyebrow ? <Eyebrow className={styles.eyebrow}>{eyebrow}</Eyebrow> : null}
       <Heading className={styles.title}>{children}</Heading>
       {lead ? <div className={styles.lead}>{lead}</div> : null}

@@ -10,13 +10,25 @@
 
 .center {
   align-items: center;
+  /* Figma's 20px column gap for this block. */
+  gap: var(--space-05);
   text-align: center;
 }
 
-/* The eyebrow is a flex row with a trailing arrow; centring the block has to centre that
-   row too, not just the text inside it. */
+/* Centring the block has to centre the eyebrow row too, not just the text inside it. */
 .center .eyebrow {
   justify-content: center;
+}
+
+/* Opt-in, because exactly one block in Figma does this. In #417:5673 (home "NUESTROS
+   SERVICIOS") the arrow is a flow child of the column — mode:none with no absolute position —
+   so it lands on its own row under the kicker, 20px below.
+   Everywhere else the arrow lives inside the kicker frame (EL-e2494a44, mode:row) and is
+   absolutely positioned at y:11, i.e. inside the text's own line box and just past its right
+   edge. Those all read inline, centred or not. */
+.stackedEyebrow .eyebrow {
+  flex-direction: column;
+  gap: var(--space-05);
 }
 
 .title {

@@ -33,8 +33,12 @@ export function ServiceCard({ href, image, index, title }: ServiceCardProps) {
           hit area while leaving the heading as real text in the a11y tree. */}
       <a className={styles.link} href={href}>
         <span className={styles.linkLabel}>Ver {title}</span>
+        {/* Figma's card arrow (component #2045:171) is a 42.04px circle holding a 13.01 x
+            9.01 glyph — a wide, short shape, i.e. a horizontal arrow. This rendered a
+            diagonal arrowUpRight, whose bounding box is square, which is why it read as the
+            wrong icon. */}
         <span aria-hidden={true} className={styles.arrow}>
-          <Icon name="arrowUpRight" />
+          <Icon name="arrowRight" />
         </span>
       </a>
     </article>
