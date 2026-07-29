@@ -14,6 +14,12 @@ import { FOOTER_LEGAL, isActivePath, isSamePageTopLink, NAV_ITEMS } from 'lib/na
 
 import type { MouseEvent } from 'react';
 
+/**
+ * Long enough to outlast the sheet's close animation and the scroll restore vaul performs
+ * on iOS immediately after it. Short enough that it is over before anyone looks away.
+ */
+const DRAWER_SETTLE_MS = 450;
+
 export interface MobileNavProps {
   /** Resolved by the server-rendered Header — a Client Component cannot read the env var. */
   contactEmail: string;
@@ -41,13 +47,38 @@ export function MobileNav({ contactEmail }: MobileNavProps) {
       return;
     }
 
+    const href = anchor.getAttribute('href') ?? '';
+
     setOpen(false);
 
     // Re-selecting the page you are already on: the router has nothing to do, so without
     // this the drawer just closes and the page stays wherever it was scrolled to.
-    if (isSamePageTopLink(anchor.getAttribute('href') ?? '', pathname)) {
+    if (isSamePageTopLink(href, pathname)) {
       window.scrollTo({ top: 0 });
     }
+
+    // …and then assert it again once the sheet has finished closing, because on iOS the
+    // sheet fights us. vaul cannot rely on `overflow: hidden` there — iOS ignores it — so it
+    // pins <body> with `position: fixed; top: -<scroll offset>` while open and calls
+    // window.scrollTo() to put that offset back as it closes. That restore runs *after* the
+    // router has navigated and scrolled, so on iPhone the page snapped straight back to
+    // wherever it was before the menu opened: tapping a section appeared to do nothing, and
+    // a service anchor landed at the old offset instead of the section. Chrome on Android
+    // never takes that code path, which is exactly why it only broke on iOS.
+    const hashIndex = href.indexOf('#');
+    const targetId = hashIndex === -1 ? '' : href.slice(hashIndex + 1);
+
+    window.setTimeout(() => {
+      if (targetId) {
+        // scrollIntoView honours the container's scroll-padding-top, so the section still
+        // clears the fixed header.
+        document.getElementById(targetId)?.scrollIntoView();
+
+        return;
+      }
+
+      window.scrollTo({ top: 0 });
+    }, DRAWER_SETTLE_MS);
   }
 
   return (

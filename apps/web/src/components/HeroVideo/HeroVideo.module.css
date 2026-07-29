@@ -13,13 +13,23 @@
   object-fit: cover;
 }
 
-/* The video sits over the poster and fades in only once frames are actually rendering,
-   so there is never a flash of black while it buffers. */
+/* The video is never faded — it is opaque from the moment it mounts.
+   WebKit only lets a muted video autoplay while it considers the element visible, and an
+   `opacity: 0` video counts as hidden. Fading the video IN therefore deadlocks on iOS: it
+   will not start because it is invisible, and it stays invisible because it never starts.
+   Chrome does not enforce that, which is why the same markup played fine on Android. */
 .video {
-  opacity: 0;
+  z-index: 0;
+}
+
+/* So the poster does the fading instead — it sits ON TOP and dissolves away once frames are
+   actually rendering. Same crossfade to the eye, no flash of black while buffering, and if
+   playback is refused outright (iOS Low Power Mode) the poster simply stays put. */
+.poster {
+  z-index: 1;
   transition: opacity var(--duration-slow) var(--ease-default);
 }
 
-.playing {
-  opacity: 1;
+.posterHidden {
+  opacity: 0;
 }
