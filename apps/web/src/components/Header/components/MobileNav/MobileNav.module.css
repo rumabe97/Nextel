@@ -186,23 +186,3 @@
 .emailIcon {
   font-size: 0.7em;
 }
-
-.legal {
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: var(--space-02);
-  gap: var(--space-02) var(--space-05);
-  list-style: none;
-}
-
-.legalLink {
-  color: var(--foreground-02);
-  font-size: var(--font-size-01);
-  letter-spacing: var(--tracking-caption);
-  text-transform: uppercase;
-  transition: color var(--duration-fast) var(--ease-default);
-}
-
-.legalLink:hover {
-  color: var(--foreground-01);
-}

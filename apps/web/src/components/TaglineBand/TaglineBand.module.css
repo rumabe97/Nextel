@@ -44,11 +44,11 @@
    measured against the Spanish string, which is the longer of the two languages. */
 @media (max-width: 48rem) {
   .line {
-    font-size: clamp(1rem, 5.6vw, 2.7rem);
+    font-size: clamp(1rem, 6.2vw, 3rem);
   }
 
   .outlined {
-    margin-left: 0.5em;
+    margin-left: 0.4em;
   }
 }
 

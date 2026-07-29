@@ -2,7 +2,7 @@ import NXLink from 'next/link';
 
 import styles from './Link.module.css';
 
-import type { AriaAttributes, ReactNode } from 'react';
+import type { AriaAttributes, MouseEventHandler, ReactNode } from 'react';
 
 export interface LinkProps {
   /** Set `'page'` on the active link in a nav list — SRs announce "current page". CSS `.active` doesn't reach assistive tech. */
@@ -11,8 +11,16 @@ export interface LinkProps {
   className?: string;
   /** **Required.** Destination URL — internal route or external URL. */
   href: string;
+  /** `hreflang` — the language of the linked document. Used by the language switcher. */
+  hrefLang?: string;
   /** Visible underline + brand colour. Use in prose (WCAG 1.4.1); skip in nav where context already identifies the link. */
   inline?: boolean;
+  /**
+   * Fires before navigation, for side effects that must happen on the way out — remembering a
+   * language preference, closing a menu. Not a replacement for `href`: the anchor still
+   * navigates, which is what keeps the link crawlable and middle-clickable.
+   */
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
   /** Forwarded to `next/link`. `null` (default) prefetches static routes; `false` disables; `true` forces. */
   prefetch?: boolean | null;
   /** `rel`. Defaults to `'noopener noreferrer'` when `target="_blank"` and not explicitly set. */
