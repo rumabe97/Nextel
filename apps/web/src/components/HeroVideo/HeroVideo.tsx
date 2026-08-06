@@ -5,13 +5,52 @@ import Image from 'next/image';
 
 import styles from './HeroVideo.module.css';
 
+const VIDEO_SRC = '/videos/hero.mp4';
+
+// Readiness milestones. Each one is a moment where a previously-refused play() may now be
+// permitted, so we ask again.
+const MEDIA_EVENTS = ['loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough', 'suspend'] as const;
+
+// Any of these is the visitor's first interaction, which lifts every remaining autoplay
+// restriction there is — including iOS Low Power Mode, which no amount of markup can talk
+// its way past. Pointer/touch/click cover phones and desktop, keydown covers keyboard-only,
+// scroll covers "started reading without touching anything".
+const GESTURE_EVENTS = ['pointerdown', 'touchstart', 'touchend', 'click', 'keydown', 'scroll'] as const;
+
+// Backoff that outlives the moment when WebKit has not yet decided the element is visible —
+// see the note in mountVideo. Bounded on purpose: after ~6s we stop burning timers and let
+// the gesture listeners do the rest.
+const RETRY_DELAYS_MS = [100, 300, 700, 1400, 2500, 4000, 6000];
+
+/** `navigator.connection` is still unshipped in Safari, so it is absent from lib.dom. */
+interface NetworkInformation {
+  effectiveType?: '2g' | '3g' | '4g' | 'slow-2g';
+  saveData?: boolean;
+}
+
+// A 2.9MB decorative loop is a bad trade on a metered or very slow connection, where it also
+// competes with content the visitor actually asked for. The poster alone is a complete hero.
+function prefersNoVideo() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return true;
+  }
+
+  const connection = (navigator as Navigator & { connection?: NetworkInformation }).connection;
+
+  if (!connection) {
+    return false;
+  }
+
+  return connection.saveData === true || connection.effectiveType === '2g' || connection.effectiveType === 'slow-2g';
+}
+
 // Figma's hero is `frame-video-inicio` — a video, not a still. Performance strategy:
 //   1. The poster is server-rendered with priority — it IS the LCP, so first paint never
 //      waits on video bytes. It is frame 0 of hero.mp4 at the video's native size, so the
 //      hand-off is invisible; a poster from a different moment of the shot made the
 //      framing visibly jump sideways when the video appeared.
-//   2. The <video> only enters the DOM after hydration, so the stream competes with
-//      nothing on the critical path.
+//   2. The <video> only enters the DOM once the browser goes idle, so the stream competes
+//      with neither hydration nor the poster.
 //   3. The video is opaque the whole time and the POSTER fades away over it — see the
 //      stylesheet, this is what makes iOS autoplay work at all.
 //   4. The slow drift is baked into the file (15fps, 0.6x) rather than applied through
@@ -20,74 +59,157 @@ import styles from './HeroVideo.module.css';
 //   5. muted + playsInline + loop = autoplay allowed everywhere, looping forever; no audio
 //      track was encoded.
 //   6. Decorative: aria-hidden video, empty-alt poster — SEO/a11y read the h1, not this.
-//   7. prefers-reduced-motion users keep the still image; the video never mounts.
+//   7. prefers-reduced-motion, Save-Data and 2g visitors keep the still; nothing is fetched.
 export function HeroVideo() {
   const [showVideo, setShowVideo] = useState(false);
   const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (prefersNoVideo()) {
       return;
     }
 
-    // A short post-hydration delay keeps the stream entirely off the critical path; by
-    // then the poster (the LCP) has long painted.
-    const handle = window.setTimeout(() => setShowVideo(true), 300);
+    // Idle rather than a fixed delay: on a fast machine the stream starts sooner than the
+    // old 300ms guess, and on a busy one it correctly waits longer. requestIdleCallback
+    // only reached Safari 16.4, hence the timeout fallback.
+    if (typeof window.requestIdleCallback === 'function') {
+      const handle = window.requestIdleCallback(() => setShowVideo(true), { timeout: 1_000 });
+
+      return () => window.cancelIdleCallback(handle);
+    }
+
+    const handle = window.setTimeout(() => setShowVideo(true), 200);
 
     return () => window.clearTimeout(handle);
   }, []);
 
-  // Safari will not start on the autoplay attribute alone: React sets `muted` as a property
-  // only, and Safari reads the *attribute* when deciding whether autoplay is permitted —
-  // without it the element is treated as unmuted and blocked. So force both, then ask for
-  // playback explicitly, and keep asking.
-  //
-  // The retries matter on iOS specifically. A first play() before any data has arrived is
-  // refused, and iOS additionally refuses outright in Low Power Mode and while the tab is
-  // backgrounded. Re-trying as the media element reaches each readiness milestone, when the
-  // page becomes visible again, and once after the visitor's first touch — which lifts the
-  // gesture requirement — covers every one of those without ever blocking the UI. If they
-  // all fail the poster simply remains, which is a perfectly good hero.
-  //
-  // useCallback keeps the ref stable: an inline callback is detached and re-invoked on
-  // every render, which would re-bind the listeners each time `playing` changes.
+  // useCallback keeps the ref stable: an inline callback is detached and re-invoked on every
+  // render, which would tear down and rebuild all of this every time `playing` changes.
   const mountVideo = useCallback((video: HTMLVideoElement | null) => {
     if (!video) {
       return;
     }
 
+    // ── 1. Become autoplay-eligible BEFORE there is anything to load ──────────────────
+    // react-dom 19 sets `muted` as a DOM *property* only — its prop table literally reads
+    // `case "muted": domElement.muted = value` — so the `muted` content attribute never
+    // reaches the DOM. WebKit reads the attribute when it decides whether a video may start
+    // on its own. That is why the JSX below deliberately carries no `src`: with no source
+    // the resource selection algorithm never runs, so nothing is evaluated until these
+    // attributes are in place and we hand it the URL ourselves.
+    video.defaultMuted = true; // this is the IDL attribute that reflects `muted`
     video.muted = true;
     video.setAttribute('muted', '');
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', ''); // iOS 9 and earlier
+    // Keeps the element out of the AirPlay/remote-playback route picker, which can otherwise
+    // suspend a background loop the moment any route is available.
+    video.setAttribute('disableremoteplayback', '');
+    video.setAttribute('x-webkit-airplay', 'deny');
+
+    video.src = VIDEO_SRC;
+    video.load();
+
+    // ── 2. Ask to play, and keep asking ──────────────────────────────────────────────
+    const teardown: Array<() => void> = [];
+    const stopTrying: Array<() => void> = [];
 
     const attempt = () => {
+      if (!video.paused) {
+        return;
+      }
+
       void video.play().catch(() => undefined);
     };
 
-    attempt();
+    // The bug this replaces: WebKit refuses autoplay for an element whose viewport
+    // visibility it has not computed yet — `MediaElementSession::autoplayPermitted()` bails
+    // out while `visibleInViewportState()` is still Unknown, which it is for the first
+    // rendering update after insertion. Every media-readiness event fires inside that same
+    // opening moment, so a retry set bound only to those can miss the window entirely and
+    // then never fire again. That is exactly why a single tap "fixed" it — the tap was the
+    // only retry trigger left. A short bounded backoff simply outlives the window.
+    const timers = RETRY_DELAYS_MS.map(delay => window.setTimeout(attempt, delay));
 
-    const mediaEvents = ['loadedmetadata', 'loadeddata', 'canplay'];
+    stopTrying.push(() => {
+      for (const timer of timers) {
+        window.clearTimeout(timer);
+      }
+    });
 
-    for (const name of mediaEvents) {
-      video.addEventListener(name, attempt);
+    // The precise, event-driven version of the same thing: fires once WebKit has actually
+    // resolved the element's viewport visibility, whenever that turns out to be.
+    if (typeof IntersectionObserver === 'function') {
+      const observer = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          attempt();
+        }
+      });
+
+      observer.observe(video);
+      stopTrying.push(() => observer.disconnect());
     }
 
-    document.addEventListener('visibilitychange', attempt);
-    // `once` so a single touch anywhere retries, then the listener is gone.
-    document.addEventListener('touchstart', attempt, { once: true, passive: true });
+    for (const name of MEDIA_EVENTS) {
+      video.addEventListener(name, attempt);
+      stopTrying.push(() => video.removeEventListener(name, attempt));
+    }
+
+    for (const name of GESTURE_EVENTS) {
+      document.addEventListener(name, attempt, { passive: true });
+      stopTrying.push(() => document.removeEventListener(name, attempt));
+    }
+
+    // ── 3. Stay playing ──────────────────────────────────────────────────────────────
+    // iOS pauses background media and does not resume it, and a bfcache restore comes back
+    // paused too. These outlive success, so they are not part of `stopTrying`.
+    const resume = () => {
+      if (document.visibilityState === 'visible') {
+        attempt();
+      }
+    };
+
+    video.addEventListener('pause', resume);
+    document.addEventListener('visibilitychange', resume);
+    window.addEventListener('pageshow', resume);
+
+    teardown.push(() => {
+      video.removeEventListener('pause', resume);
+      document.removeEventListener('visibilitychange', resume);
+      window.removeEventListener('pageshow', resume);
+    });
+
+    // Once frames are rendering, drop the whole retry apparatus — six document-level
+    // listeners and seven timers are not something to leave armed for the session.
+    const settle = () => {
+      for (const stop of stopTrying.splice(0)) {
+        stop();
+      }
+    };
+
+    const handlePlaying = () => {
+      setPlaying(true);
+      settle();
+    };
+
+    video.addEventListener('playing', handlePlaying);
+    teardown.push(() => video.removeEventListener('playing', handlePlaying));
+
+    attempt();
 
     return () => {
-      for (const name of mediaEvents) {
-        video.removeEventListener(name, attempt);
-      }
+      settle();
 
-      document.removeEventListener('visibilitychange', attempt);
-      document.removeEventListener('touchstart', attempt);
+      for (const undo of teardown) {
+        undo();
+      }
     };
   }, []);
 
   return (
     <div className={styles.media}>
-      {/* Rendered before the poster so the poster paints on top of it. */}
+      {/* Rendered before the poster so the poster paints on top of it. `src` is set in the
+          ref, not here — see mountVideo. */}
       {showVideo ? (
         <video
           aria-hidden={true}
@@ -95,11 +217,9 @@ export function HeroVideo() {
           className={styles.video}
           loop={true}
           muted={true}
-          onPlaying={() => setPlaying(true)}
           playsInline={true}
           preload="auto"
           ref={mountVideo}
-          src="/videos/hero.mp4"
           tabIndex={-1}
         />
       ) : null}
