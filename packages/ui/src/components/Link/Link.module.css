@@ -1,5 +1,11 @@
+/* Deliberately does NOT set `color`. The global reset in ui/styles/base.css already gives
+   every <a> `color: inherit`, and it does so with a type selector (0-0-1) that any consumer
+   class outbids. Declaring it here too made it a class (0-1-0) that ties with — and, because
+   this stylesheet loads after the app's CSS modules, beats — the consumer's own single-class
+   rule. That silently discarded the colour on every styled Link in the app: the current nav
+   item never turned Primary, only its :hover did (0-2-0, so it still won), which made the bug
+   read as "active works on desktop but not on touch" when in fact it worked nowhere. */
 .link {
-  color: inherit;
   text-decoration: inherit;
 }
 
