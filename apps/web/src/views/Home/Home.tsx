@@ -9,6 +9,7 @@ import { pathFor, SERVICE_ANCHORS } from 'i18n/config';
 
 import { Eyebrow } from 'components/Eyebrow';
 import { Glow } from 'components/Glow';
+import { HeroTagline } from 'components/HeroTagline';
 import { HeroVideo } from 'components/HeroVideo';
 import { Icon } from 'components/Icon';
 import { PageSection } from 'components/PageSection';
@@ -35,29 +36,10 @@ export function Home({ dictionary, locale }: HomeProps) {
         <HeroVideo />
         <div className={styles.heroOverlay} />
 
-        {/* Figma GROUP "N" (#417:5623): a 508px Primary glow behind the white N icon
-            (NEXTEL_Icono-01, fill_e52d51cb) — layered UNDER the tagline text. */}
-        <div className={styles.heroMark}>
-          <Glow className={styles.heroMarkGlow} size={508} />
-          {/* unoptimized: the file is already a 7KB lossless-alpha webp; the optimizer's
-              lossy re-encode can only dull the pure-white fill. */}
-          <Image alt="" className={styles.heroIcon} height={516} priority={true} src="/images/icon-n.webp" unoptimized={true} width={330} />
-        </div>
-
-        {/* Component 2 (#2019:759) — the tagline OVER the N: line 1 Roboto Black 900
-            left-aligned, line 2 Roboto Thin 100 right-aligned one row down (the offset
-            "tab" comes from the right alignment against the shorter last line). */}
-        <h1 className={styles.tagline}>
-          <span className={styles.taglineRowStart}>
-            <span className={styles.taglineBlack}>{home.tagline.first}</span>
-          </span>
-          <span className={styles.taglineRowStart}>
-            <span className={styles.taglineBlack}>{home.tagline.second}</span> <span className={styles.taglineThin}>{home.tagline.third}</span>
-          </span>
-          <span className={styles.taglineRowEnd}>
-            <span className={styles.taglineThin}>{home.tagline.fourth}</span>
-          </span>
-        </h1>
+        {/* Figma GROUP "N" (#417:5623) + Component 2 (#2019:759). Both live in HeroTagline:
+            the watermark has to stay centred on the headline text at every width, which is
+            an invariant only their shared container can hold. */}
+        <HeroTagline tagline={home.tagline} />
       </section>
 
       <PageSection className={styles.introSection} flush={true}>

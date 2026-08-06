@@ -1,0 +1,121 @@
+/* The watermark and the headline share this single grid cell, which is what guarantees the N
+   stays centred on the text at every width. container-type makes `100cqi` below resolve to
+   the space the hero actually gives the headline. */
+.root {
+  container-type: inline-size;
+  display: grid;
+  width: 100%;
+  grid-area: 1 / 1;
+  place-items: center;
+  place-self: center;
+}
+
+/* Declared on the children rather than on .root: an element never queries its own container,
+   so `100cqi` written inside .root would resolve against .root's ancestor instead.
+
+   Fit the headline to its own text instead of to a vw slope. `--tagline-fit` is the widest
+   row's width in em with its indent and Figma's column slack folded in, measured in the
+   browser by HeroTagline.tsx. A slope cannot do this job: it has to clear the longest row in
+   the longest language, so it needed a 2.25rem floor to stay legible on a phone — and that
+   floor then held the type at a flat 36px from 320px all the way to 545px, leaving 179px of
+   the box empty at 540px. The cap is Figma's own 140px. */
+.mark,
+.tagline {
+  --tagline-size: min(8.75rem, calc(min(1249px, 100cqi) / var(--tagline-fit, 10.4)));
+
+  grid-area: 1 / 1;
+}
+
+.mark {
+  position: relative;
+  z-index: 0;
+  display: grid;
+  place-items: center;
+}
+
+.glow {
+  top: 50%;
+  left: 50%;
+}
+
+/* Figma draws the icon at 330×516 against a 120px headline — 4.3em, so the watermark now
+   keeps one fixed proportion to the type. It used to run on its own `clamp(14rem, 27vw, …)`
+   scale, which hit its floor at a different width than the headline hit its own: on a phone
+   the N came out 1.88× the height of the text block against 1.23× on desktop, which is what
+   made it look wrong rather than merely large. */
+.icon {
+  width: auto;
+  height: calc(var(--tagline-size) * 4.3);
+  opacity: 0.35;
+}
+
+/* position:relative + z-index guarantees the text paints over the mark in every stacking
+   interpretation, not just the grid-item one.
+   width:fit-content is load-bearing for the centring: the box now hugs the text, so centring
+   the box centres the text. */
+.tagline {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  flex-direction: column;
+  font-size: var(--tagline-size);
+  line-height: 1.07;
+  text-transform: uppercase;
+}
+
+/* Three explicit rows: CONECTAMOS / HOY,IMPULSAMOS / EL MAÑANA. Rows 1–2 hug the left
+   edge, row 3 is indented — no negative-margin overlap tricks. */
+.rowStart,
+.rowEnd {
+  display: block;
+  /* Every row holds its line. Row 2 was previously the only one without this, so at 320px
+     "hoy, impulsamos" wrapped and the three-row lockup silently became four. */
+  white-space: nowrap;
+  animation: taglineIn 0.9s var(--ease-default) both;
+}
+
+.rowStart {
+  text-align: left;
+}
+
+/* Figma: "EL MAÑANA" is not flush-right — its left edge starts under the M–P of
+   IMPULSAMOS on the row above. The em offset ≈ width of "HOY, " plus one glyph, so it
+   tracks the font size at every breakpoint. */
+.rowEnd {
+  margin-left: 4.1em;
+  animation-delay: 0.25s;
+  text-align: left;
+}
+
+/* The indent is bought with type size: it counts against the width the longest row has to fit
+   into, and on a phone that is the difference between a 36px and a 33px headline. The offset
+   structure is kept, just at a cheaper depth. */
+@media (max-width: 40rem) {
+  .rowEnd {
+    margin-left: 1.4em;
+  }
+}
+
+.black {
+  color: var(--foreground-01);
+  font-weight: 900;
+}
+
+.thin {
+  color: var(--foreground-01);
+  font-weight: 100;
+}
+
+@keyframes taglineIn {
+  from {
+    opacity: 0;
+    transform: translateY(0.2em);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

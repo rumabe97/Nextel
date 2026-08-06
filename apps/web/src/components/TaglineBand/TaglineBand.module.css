@@ -1,4 +1,8 @@
+/* container-type makes `100cqi` below resolve to this element's own content box, so the type
+   is fitted to the space the band actually has rather than to the viewport — which is not the
+   same number once the band has padding, and diverges further at each breakpoint. */
 .band {
+  container-type: inline-size;
   display: flex;
   overflow: hidden;
   flex-direction: column;
@@ -10,6 +14,14 @@
   padding-inline: var(--space-06);
 }
 
+/* A phone is where every pixel of inset costs real type size, and where the band is furthest
+   from Figma's near-full-bleed intent. 16px still reads as a margin. */
+@media (max-width: 48rem) {
+  .band {
+    padding-inline: var(--space-04);
+  }
+}
+
 @media (min-width: 64rem) {
   .band {
     padding-inline: max(1rem, 0.85vw);
@@ -19,15 +31,17 @@
 /* Figma #2045:220/222 (style_20553229): Roboto Bold 142 / line-height 166 (1.17), uppercase,
    tight display tracking. The block is LEFT-aligned: line 1 starts at the page edge (x:16),
    line 2 is indented ~125px — the "tab". Line 2 is outline-only: no fill, 1px stroke at
-   40% white. The 7.3vw slope keeps the longest line inside the viewport at every width. */
+   40% white. */
 .line {
   font-family: var(--font-heading), var(--font-fallback);
-  /* Figma draws this at 142px on a 1920 board — 7.4vw. That does not actually fit: the
-     longer of the two phrases ("IMPULSAMOS EL MAÑANA") runs about 14x the font size once its
-     indent is counted, so at 7.3vw it ran ~70px past the viewport at 1440 and `overflow:
-     hidden` quietly cut the end off. 6.8vw is the widest slope where the full phrase still
-     lands inside the screen at every desktop width, in both languages. */
-  font-size: clamp(1.7rem, 6.8vw, 8.875rem);
+  /* Fit to the text, not to the viewport. `--band-fit` is the widest line's width in em with
+     its indent counted, measured in the browser by TaglineBand.tsx, so dividing the band's
+     width by it yields precisely the size at which the longest phrase spans the band.
+     A fixed vw slope cannot do this: it has to be tuned for the longest string in the longest
+     language, so it left English ~24% smaller than it had room for, and still had to keep
+     shrinking on a phone to stay inside `overflow: hidden`. The cap is Figma's own 142px.
+     The fallback matches the component's pre-measurement estimate. */
+  font-size: min(8.875rem, calc(100cqi / var(--band-fit, 14)));
   font-weight: var(--font-weight-bold);
   letter-spacing: -0.015em;
   line-height: 1.17;
@@ -36,20 +50,6 @@
     opacity var(--duration-slow) var(--ease-default),
     transform 0.7s var(--ease-default);
   white-space: nowrap;
-}
-
-/* 7.3vw matches Figma at desktop, but the longest line ("IMPULSAMOS EL MAÑANA") is ~13x the
-   font size, so at phone widths that slope pushed it past the viewport and `overflow: hidden`
-   simply cut it off. A gentler slope below the breakpoint keeps the whole phrase on screen —
-   measured against the Spanish string, which is the longer of the two languages. */
-@media (max-width: 48rem) {
-  .line {
-    font-size: clamp(1rem, 6.2vw, 3rem);
-  }
-
-  .outlined {
-    margin-left: 0.4em;
-  }
 }
 
 .filled {
@@ -65,6 +65,14 @@
   color: transparent;
   opacity: 0;
   transform: translateX(10%);
+}
+
+/* The indent is pure decoration but it is bought with type size, since it counts against the
+   width the longest line has to fit into. Cheaper on a phone, where size matters more. */
+@media (max-width: 48rem) {
+  .outlined {
+    margin-left: 0.4em;
+  }
 }
 
 .visible .filled,
