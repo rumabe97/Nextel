@@ -11,7 +11,7 @@ import { Link } from 'ui/components/Link';
 import { Icon } from 'components/Icon';
 import { LanguageSwitcher } from 'components/LanguageSwitcher';
 
-import { isActivePath, isSamePageTopLink } from 'lib/navigation';
+import { isActivePath } from 'lib/navigation';
 
 import type { Dictionary } from 'i18n/dictionaries/es';
 import type { Locale } from 'i18n/config';
@@ -19,10 +19,43 @@ import type { MouseEvent } from 'react';
 import type { NavItem } from 'lib/navigation';
 
 /**
- * Long enough to outlast the sheet's close animation and the scroll restore vaul performs
- * on iOS immediately after it. Short enough that it is over before anyone looks away.
+ * Upper bound on how long to keep trying to reach the tapped destination. Only a give-up
+ * point — the attempt stops the moment the page can actually be scrolled and the target
+ * exists, which is normally within a frame or two of the sheet closing.
  */
-const DRAWER_SETTLE_MS = 450;
+const LANDING_TIMEOUT_MS = 1500;
+
+/**
+ * Puts the visitor where the tapped link says they should be, as soon as that is possible.
+ * Two things have to be true first: <body> must be unpinned — vaul fixes it in place while
+ * the sheet is open and a fixed body cannot be scrolled — and, for a service anchor, the
+ * section has to exist, which it does not until its route has committed and rendered.
+ *
+ * Retrying per frame rather than waiting a fixed delay is the point: the old code guessed
+ * 450ms, which was both too late (the visitor watched the scroll happen) and, on a slow
+ * connection, too early (the section had not rendered, so the scroll silently did nothing).
+ */
+function land(targetId: string, deadline: number) {
+  const target = targetId ? document.getElementById(targetId) : null;
+  const ready = document.body.style.position !== 'fixed' && (!targetId || target !== null);
+
+  if (ready) {
+    if (target) {
+      // block:'start' plus html's scroll-padding-top drops the section below the fixed header.
+      target.scrollIntoView({ behavior: 'instant', block: 'start' });
+    } else {
+      window.scrollTo({ behavior: 'instant', top: 0 });
+    }
+  }
+
+  if (ready || Date.now() > deadline) {
+    document.documentElement.style.scrollBehavior = '';
+
+    return;
+  }
+
+  window.requestAnimationFrame(() => land(targetId, deadline));
+}
 
 export interface MobileNavProps {
   /** Resolved by the server-rendered Header — a Client Component cannot read the env var. */
@@ -58,34 +91,31 @@ export function MobileNav({ contactEmail, dictionary, items, locale }: MobileNav
 
     setOpen(false);
 
-    // Re-selecting the page you are already on: the router has nothing to do, so without
-    // this the drawer just closes and the page stays wherever it was scrolled to.
-    if (isSamePageTopLink(href, pathname)) {
-      window.scrollTo({ top: 0 });
+    // mailto: and anything else off-site leaves the page where it is — only close the sheet.
+    if (!href.startsWith('/')) {
+      return;
     }
 
-    // …and then assert it again once the sheet has finished closing, because on iOS the
-    // sheet fights us. vaul cannot rely on `overflow: hidden` there — iOS ignores it — so it
-    // pins <body> with `position: fixed; top: -<scroll offset>` while open and calls
-    // window.scrollTo() to put that offset back as it closes. That restore runs *after* the
-    // router has navigated and scrolled, so on iPhone the page snapped straight back to
-    // wherever it was before the menu opened: tapping a section appeared to do nothing, and
-    // a service anchor landed at the old offset instead of the section. Chrome on Android
-    // never takes that code path, which is exactly why it only broke on iOS.
+    // Every movement between here and the landing has to be instant. The document carries
+    // `scroll-behavior: smooth`, which turns each of vaul's restore, the router's
+    // scroll-to-top, the browser's fragment jump and our own final positioning into its own
+    // animation. Run back to back, those are the "drops back to where I was, then crawls all
+    // the way up" — the visitor was watching two or three separate scrolls play out. An
+    // inline style outranks the stylesheet; land() puts it back.
+    document.documentElement.style.scrollBehavior = 'auto';
+
+    // vaul pins <body> with `position: fixed; top: -<scrollY>` while the sheet is open,
+    // because that is the only thing that locks scrolling on iOS, and on close it reads that
+    // offset back out to scroll there. Rewriting the offset to zero now aims its restore at
+    // the top of the document instead of wherever the visitor had got to, so the page moves
+    // once — and the drawer, not a timer racing it, is what moves it.
+    if (document.body.style.position === 'fixed') {
+      document.body.style.top = '0px';
+    }
+
     const hashIndex = href.indexOf('#');
-    const targetId = hashIndex === -1 ? '' : href.slice(hashIndex + 1);
 
-    window.setTimeout(() => {
-      if (targetId) {
-        // scrollIntoView honours the container's scroll-padding-top, so the section still
-        // clears the fixed header.
-        document.getElementById(targetId)?.scrollIntoView();
-
-        return;
-      }
-
-      window.scrollTo({ top: 0 });
-    }, DRAWER_SETTLE_MS);
+    land(hashIndex === -1 ? '' : href.slice(hashIndex + 1), Date.now() + LANDING_TIMEOUT_MS);
   }
 
   return (

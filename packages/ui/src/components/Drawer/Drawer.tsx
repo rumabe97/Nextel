@@ -22,7 +22,12 @@ export interface DrawerProps {
 
 export function Drawer({ children, description, onOpenChange, open, title, trigger }: DrawerProps) {
   return (
-    <VaulDrawer.Root onOpenChange={onOpenChange} open={open}>
+    // preventScrollRestoration: vaul defaults this to FALSE, so on close it always scrolls
+    // back to wherever the page was when the drawer opened — including when the drawer was
+    // used to navigate somewhere else entirely, where restoring the old page's offset is
+    // never what anyone wants. With it on, vaul skips the restore whenever the URL changed
+    // while the drawer was open.
+    <VaulDrawer.Root onOpenChange={onOpenChange} open={open} preventScrollRestoration={true}>
       <VaulDrawer.Trigger asChild={true}>{trigger}</VaulDrawer.Trigger>
       <VaulDrawer.Portal>
         <VaulDrawer.Overlay className={styles.overlay} />
