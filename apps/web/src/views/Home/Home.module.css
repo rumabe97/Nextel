@@ -73,12 +73,19 @@
   padding-block: var(--section-gap);
 }
 
-/* Buys back the gap the shorter hero costs, and then some. The hero is centred, so halving its
-   height loss lands on this side of it; this padding is what keeps the lead paragraph clear of
-   the footage instead of tucked under it. */
+/* Buys back the gap the shorter hero costs. The hero is centred, so half of any height it
+   loses lands on this side of it, and this padding is what keeps the lead paragraph clear of
+   the footage instead of tucked under it.
+   Sized in svh, not rem: what the eye judges is the band of empty background between the video
+   and the first line of copy, and how big that reads depends entirely on how much screen it is
+   sitting in. A flat 8rem measured fine in an emulator and came out as a dead strip on a real
+   phone — at 168px it pushed the text past the fold entirely, so the page loaded as hero plus
+   blank. 8svh holds the same proportion on a 480px SE as on an 833px Pro Max, and keeps the
+   first line of the paragraph in view on all of them. */
 @media (max-width: 48rem) {
   .introSection {
-    padding-top: calc(var(--section-gap) + 8rem);
+    padding-top: calc(var(--section-gap) + 8vh);
+    padding-top: calc(var(--section-gap) + 8svh);
   }
 }
 
