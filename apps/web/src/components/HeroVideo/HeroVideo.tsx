@@ -18,9 +18,12 @@ const MEDIA_EVENTS = ['loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough
 const GESTURE_EVENTS = ['pointerdown', 'touchstart', 'touchend', 'click', 'keydown', 'scroll'] as const;
 
 // Backoff that outlives the moment when WebKit has not yet decided the element is visible —
-// see the note in mountVideo. Bounded on purpose: after ~6s we stop burning timers and let
-// the gesture listeners do the rest.
-const RETRY_DELAYS_MS = [100, 300, 700, 1400, 2500, 4000, 6000];
+// see the note in mountVideo. Dense at the start, then a slow tail: iOS effectively ignores
+// `preload` and only fetches once playback is requested, so on a phone connection the first
+// several attempts can all land before there is a single frame to show. Stopping at 6s, as
+// this used to, gave up while the file was still arriving. The tail costs one timer every
+// 1.5s and stops the instant a frame renders.
+const RETRY_DELAYS_MS = [100, 300, 700, 1400, 2500, 4000, 6000, 8000, 10_000, 12_500, 15_000, 18_000, 21_000, 25_000];
 
 /** `navigator.connection` is still unshipped in Safari, so it is absent from lib.dom. */
 interface NetworkInformation {
@@ -171,12 +174,18 @@ export function HeroVideo() {
 
     video.addEventListener('pause', resume);
     document.addEventListener('visibilitychange', resume);
+    // pageshow covers a bfcache restore; focus and orientationchange are moments Safari
+    // re-evaluates the page and has been observed to release a previously refused element.
     window.addEventListener('pageshow', resume);
+    window.addEventListener('focus', resume);
+    window.addEventListener('orientationchange', resume);
 
     teardown.push(() => {
       video.removeEventListener('pause', resume);
       document.removeEventListener('visibilitychange', resume);
       window.removeEventListener('pageshow', resume);
+      window.removeEventListener('focus', resume);
+      window.removeEventListener('orientationchange', resume);
     });
 
     // Once frames are rendering, drop the whole retry apparatus — six document-level

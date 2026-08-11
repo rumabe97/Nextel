@@ -4,12 +4,29 @@
   position: relative;
   display: grid;
   overflow: hidden;
+  /* svh, not vh. On iOS Safari `100vh` is the LARGE viewport — the height the page gets once
+     the address bar has retracted — so a 100vh hero is about 99px taller than what is actually
+     on screen when the page loads, and you scroll a whole thumb-length still looking at hero.
+     `svh` is the small viewport: the visible one. The vh line stays as a fallback for browsers
+     older than Safari 15.4 / Chrome 108. */
   min-height: min(100vh, 56rem);
+  min-height: min(100svh, 56rem);
   /* Cancel main's header offset so the video runs edge-to-edge behind the fixed header. */
   margin-top: calc(var(--header-height) * -1);
   padding: calc(var(--header-height) + var(--space-09)) var(--space-06) var(--space-09);
   place-items: center;
   isolation: isolate;
+}
+
+/* Shorter than the viewport on a phone. Paired with .introSection's matching top padding
+   below: the hero centres its content, so every pixel taken off its height is split half above
+   and half below the tagline and drags the copy underneath up with it. Shrinking the hero
+   alone is what made that copy feel cramped last time — the two have to move together. */
+@media (max-width: 48rem) {
+  .hero {
+    min-height: min(80vh, 56rem);
+    min-height: min(80svh, 56rem);
+  }
 }
 
 /* Darker than the raw footage — the Figma still reads considerably deeper, and the
@@ -18,7 +35,19 @@
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: linear-gradient(180deg, rgba(19, 19, 19, 0.65) 0%, rgba(19, 19, 19, 0.45) 45%, #131313 100%);
+  /* Eased rather than a straight ramp. Three stops interpolate alpha linearly, so the wash
+     gains opacity at a constant rate and then simply arrives at solid — the eye reads that
+     landing as an edge, which is what made the video look like it stopped rather than faded.
+     The extra stops curve the approach so the last of the footage dissolves out. */
+  background: linear-gradient(
+    180deg,
+    rgba(19, 19, 19, 0.65) 0%,
+    rgba(19, 19, 19, 0.45) 42%,
+    rgba(19, 19, 19, 0.56) 62%,
+    rgba(19, 19, 19, 0.74) 78%,
+    rgba(19, 19, 19, 0.9) 90%,
+    #131313 100%
+  );
 }
 
 /* Not in Figma — see Home.tsx. Centre column, low in the positioning block rather than on its
@@ -42,6 +71,15 @@
 
 .introSection {
   padding-block: var(--section-gap);
+}
+
+/* Buys back the gap the shorter hero costs, and then some. The hero is centred, so halving its
+   height loss lands on this side of it; this padding is what keeps the lead paragraph clear of
+   the footage instead of tucked under it. */
+@media (max-width: 48rem) {
+  .introSection {
+    padding-top: calc(var(--section-gap) + 8rem);
+  }
 }
 
 /* Ellipse #2007:802 — centre 93.9%. Figma starts this glow 29px BELOW the hero (y1109 against
