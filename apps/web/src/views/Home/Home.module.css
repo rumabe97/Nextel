@@ -21,15 +21,36 @@
   background: linear-gradient(180deg, rgba(19, 19, 19, 0.65) 0%, rgba(19, 19, 19, 0.45) 45%, #131313 100%);
 }
 
+/* Not in Figma — see Home.tsx. Centre column, low in the positioning block rather than on its
+   midline: .introGlow above is the largest glow on the page (968px across) and its centre sits
+   at almost exactly the same height, so at 50% the two overlapped on both axes. 115% drops
+   this clear of it and still lands well above .servicesGlow. The one value holds at every
+   width — on a phone it gives 435px of daylight below .introGlow, which is what matters there,
+   since a narrow screen has no horizontal room and only vertical distance separates anything. */
+.positioningGlow {
+  top: 115%;
+  left: 48%;
+}
+
+/* Not in Figma — see Home.tsx. Left of centre, on the service cards' midline. */
+.servicesGlow {
+  top: 50%;
+  left: 6%;
+}
+
 /* ── Intro (Figma "About info" #417:5636) ─────────────────────────────── */
 
 .introSection {
   padding-block: var(--section-gap);
 }
 
-/* Ellipse #2007:802 — centre 93.9% / vertically on the section's midline. */
+/* Ellipse #2007:802 — centre 93.9%. Figma starts this glow 29px BELOW the hero (y1109 against
+   a hero ending at 1080); it never crosses the seam. Centring it on this section's midline
+   instead put 357px of a 484px radius up inside the hero, where the video's hard bottom edge
+   sliced the soft gradient in half. Anchoring to its own radius keeps the top edge one
+   --space-06 clear of the seam at every viewport, however the diameter scales. */
 .introGlow {
-  top: 50%;
+  top: calc(var(--glow-radius) + var(--space-06));
   left: 93.9%;
 }
 

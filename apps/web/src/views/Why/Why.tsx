@@ -29,17 +29,21 @@ export function Why({ dictionary, locale }: WhyProps) {
   return (
     <Fragment>
       <PageSection className={styles.headerSection}>
-        {/* Figma 05: 508px blue glow left (#417:6475) + 376px amber @60% right (#417:6483). */}
+        {/* Figma 05: 508px glow left (#417:6475). Figma draws this page's glows amber; the site
+            runs one Primary palette, so they are blue here. */}
         <Glow className={styles.headerGlowBlue} size={508} />
-        <Glow className={styles.headerGlowAmber} opacity={0.6} size={376} tone="amber" />
-        {/* Ellipse #417:6476: 381px amber @30%, top-right corner. */}
-        <Glow className={styles.headerGlowTop} opacity={0.3} size={381} tone="amber" />
+        {/* Ellipse #417:6476: 381px @30%, top-right corner. */}
+        <Glow className={styles.headerGlowTop} opacity={0.3} size={381} />
         <SectionHeading as="h1" eyebrow={why.eyebrow} lead={why.lead}>
           {why.heading}
         </SectionHeading>
       </PageSection>
 
       <PageSection divided={true}>
+        {/* Not in Figma. All three of its glows are stacked in the header, so everything below
+            the fold ran dark — 84% of the page. */}
+        <Glow className={styles.reasonsGlow} opacity={0.22} size={440} />
+
         <ol className={styles.reasons}>
           {why.reasons.map(reason => (
             <li className={styles.reason} key={reason.title}>
@@ -51,6 +55,10 @@ export function Why({ dictionary, locale }: WhyProps) {
       </PageSection>
 
       <PageSection divided={true}>
+        {/* Not in Figma. The reasons glow above only reaches so far; this page is 2169px and
+            Figma lights only its header. */}
+        <Glow className={styles.commitmentsGlow} opacity={0.2} size={420} />
+
         <div className={styles.commitments}>
           <SectionHeading eyebrow={why.commitment.eyebrow}>{why.commitment.heading}</SectionHeading>
 
@@ -59,6 +67,12 @@ export function Why({ dictionary, locale }: WhyProps) {
       </PageSection>
 
       <PageSection divided={true}>
+        {/* Figma's #417:6483 (376px @60%). It belongs to this page's header in Figma, but that
+            frame is 4762px tall against our 2169 — at our height it landed 296px from
+            .headerGlowTop and read as one smudge with it. Moved to the CTA, which was the
+            page's last dark stretch, so the same three Figma glows now span the page. */}
+        <Glow className={styles.ctaGlow} opacity={0.6} size={376} />
+
         <div className={styles.cta}>
           <p className={styles.ctaTitle}>{why.cta.title}</p>
           <Link className={styles.ctaLink} href={pathFor('contact', locale)}>

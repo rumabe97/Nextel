@@ -57,6 +57,11 @@ export function Home({ dictionary, locale }: HomeProps) {
       </PageSection>
 
       <PageSection divided={true}>
+        {/* Not in Figma. The positioning block was the only section on this page with no light
+            of its own, and the page's other glows all sit hard against one edge or the other —
+            this one runs down the middle. */}
+        <Glow className={styles.positioningGlow} opacity={0.17} size={400} />
+
         <div className={styles.positioning}>
           <div className={styles.positioningBody}>
             <Eyebrow>{home.positioning.eyebrow}</Eyebrow>
@@ -70,6 +75,11 @@ export function Home({ dictionary, locale }: HomeProps) {
       </PageSection>
 
       <PageSection>
+        {/* Not in Figma. Added to light a measured dead stretch: every Figma glow on this page sits right of centre (93.9%, 91.5%) or off
+            the left edge (-2%), leaving the whole service-card band dark. Left side, low
+            opacity, so it balances the pair above rather than competing with them. */}
+        <Glow className={styles.servicesGlow} opacity={0.22} size={440} />
+
         <SectionHeading align="center" eyebrow={home.services.eyebrow} stackedEyebrow={true}>
           {home.services.heading}
         </SectionHeading>

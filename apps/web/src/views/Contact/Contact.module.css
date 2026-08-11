@@ -28,11 +28,29 @@
 }
 
 /* Ellipse #2002:1505 — centre 92.6%, hugging the top edge. Stays above the skyline
-   overlay (same z, later in DOM) but under all content. */
+   overlay (same z, later in DOM) but under all content.
+   One rule at every width on purpose: the ≥48rem/≥64rem overrides used to set `right` without
+   clearing the `left` above, so `right` was ignored and only their `top: -6rem` took effect —
+   which put the centre 96px above the page and left `overflow: hidden` showing a sliver. */
 .cornerGlow {
   z-index: -1;
   top: 9rem;
   left: 92.6%;
+}
+
+/* Not in Figma — see Contact.tsx. Centre, between the corner glow and the low one: this page
+   is short and had a 568px dark band straight through the middle of the form. */
+.midGlow {
+  z-index: -1;
+  top: 46%;
+  left: 47%;
+}
+
+/* Not in Figma — see Contact.tsx. Low and left, opposite .cornerGlow. */
+.formGlow {
+  z-index: -1;
+  top: 86%;
+  left: 8%;
 }
 
 .inner {
@@ -47,24 +65,12 @@
 }
 
 @media (min-width: 48rem) {
-  .cornerGlow {
-    z-index: -1;
-    top: -6rem;
-    right: -8rem;
-  }
-
   .inner {
     padding-inline: var(--space-09);
   }
 }
 
 @media (min-width: 64rem) {
-  .cornerGlow {
-    z-index: -1;
-    top: -6rem;
-    right: -8rem;
-  }
-
   .inner {
     grid-template-columns: 0.8fr 1.2fr;
   }

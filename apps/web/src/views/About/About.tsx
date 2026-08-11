@@ -52,6 +52,10 @@ export function About({ dictionary }: AboutProps) {
       </PageSection>
 
       <PageSection>
+        {/* Not in Figma. Added to light a measured dead stretch: the four Figma glows sit at the very top and the very bottom of this page,
+            so the middle 1900px had none at all. */}
+        <Glow className={styles.introGlow} opacity={0.2} size={440} />
+
         <div className={styles.intro}>
           <div className={styles.introBody}>
             <h1 className={styles.introTitle}>{about.introTitle}</h1>
@@ -101,6 +105,10 @@ export function About({ dictionary }: AboutProps) {
       </PageSection>
 
       <PageSection>
+        {/* Not in Figma. The run between the intro and the banner was 1381px with no light in
+            it at all — the longest dark stretch on the site. */}
+        <Glow className={styles.teamGlow} opacity={0.19} size={430} />
+
         <SectionHeading align="center" eyebrow={about.team.eyebrow}>
           {about.team.heading}
         </SectionHeading>
@@ -115,8 +123,9 @@ export function About({ dictionary }: AboutProps) {
       </PageSection>
 
       <PageSection className={styles.bannerSection}>
-        {/* Ellipses #2019:456 (336px amber @40%) and #2019:449 (1041px blue @26%). */}
-        <Glow className={styles.bannerGlowAmber} opacity={0.4} size={336} tone="amber" />
+        {/* Ellipses #2019:456 (336px @40%) and #2019:449 (1041px @26%). Figma tints the first
+            amber; the site keeps one Primary palette, so both are blue. */}
+        <Glow className={styles.bannerGlowCentre} opacity={0.4} size={336} />
         <Glow className={styles.bannerGlowBlue} opacity={0.26} size={1041} />
         <p className={styles.banner}>
           {about.banner.lead} <RotatingWord words={about.banner.words} />

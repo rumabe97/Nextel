@@ -69,9 +69,6 @@
   /* Deep petrol from the brand deck; the second stop of every hero/footer gradient. */
   --color-petrol: #12455b;
 
-  /* The warm accent Figma uses for the amber glow ellipses (rgba(237,188,90,…)). */
-  --color-glow-amber: #edbc5a;
-
   /* Figma lays the site out on a 1296px content column inside a 1920px frame. */
   --content-width: 1296px;
 

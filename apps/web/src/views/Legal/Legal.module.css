@@ -1,3 +1,32 @@
+/* Mirrors Contact's .cornerGlow so the two quietest pages on the site are lit the same way. */
+.cornerGlow {
+  z-index: -1;
+  top: 9rem;
+  left: 92.6%;
+}
+
+/* Centre, in the upper third: the run from the corner glow to the midline was 897px. */
+.upperGlow {
+  z-index: -1;
+  top: 24%;
+  left: 50%;
+}
+
+/* Left, on the document's midline. */
+.midGlow {
+  z-index: -1;
+  top: 45%;
+  left: 7%;
+}
+
+/* Right, closing the column out. Pulled up from 82%: at the foot it left an 856px hole above
+   it, and this column is long enough that the four need to be evenly strung down it. */
+.footGlow {
+  z-index: -1;
+  top: 72%;
+  left: 90%;
+}
+
 /* One measured column. Legal text is read, not scanned, so the line length is capped well
    below the site's content width and the rhythm is looser than a marketing block. */
 .document {

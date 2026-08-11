@@ -1,3 +1,24 @@
+/* Not in Figma — see Services.tsx. Right side: the Figma hero glow is already at 7.6%, so
+   putting this one on the left too stacked the pair 6px apart in x — 501px of vertical gap
+   still read as a single smear down the left edge rather than two lights. The page now
+   zigzags left → right → left. */
+.pillarsGlow {
+  top: 52%;
+  left: 88%;
+}
+
+/* Not in Figma — see Services.tsx. Centre, high in the cards block. */
+.cardsGlowLead {
+  top: 13%;
+  left: 50%;
+}
+
+/* Not in Figma — see Services.tsx. Back to the left, completing the zigzag. */
+.cardsGlow {
+  top: 45%;
+  left: 12%;
+}
+
 /* Ellipse #2042:685 — centre 7.6%, mid-hero. */
 .heroGlow {
   top: 55%;

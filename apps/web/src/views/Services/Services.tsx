@@ -54,6 +54,10 @@ export function Services({ dictionary }: ServicesProps) {
       </PageSection>
 
       <PageSection>
+        {/* Not in Figma, which lights only this page's hero. Right side — the hero glow owns
+            the left edge, so this alternates against it instead of stacking under it. */}
+        <Glow className={styles.pillarsGlow} opacity={0.2} size={420} />
+
         <SectionHeading align="center" as="h1" eyebrow={services.eyebrow}>
           {services.heading}
         </SectionHeading>
@@ -70,6 +74,12 @@ export function Services({ dictionary }: ServicesProps) {
       </PageSection>
 
       <PageSection>
+        {/* Not in Figma — Figma lights only this page's hero. Two here, because 813px of the
+            run between the pillars and the second card had nothing in it. Centre then left,
+            so neither shares a column with the other or with the hero glow above. */}
+        <Glow className={styles.cardsGlowLead} opacity={0.18} size={400} />
+        <Glow className={styles.cardsGlow} opacity={0.24} size={460} />
+
         <div className={styles.cards}>
           <ExpertiseCard
             id={SERVICE_ANCHORS.newPlant}

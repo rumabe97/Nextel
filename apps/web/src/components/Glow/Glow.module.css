@@ -2,10 +2,10 @@
   position: absolute;
   z-index: -1;
   transform: translate(-50%, -50%);
-  max-width: 95vw;
-  max-height: 95vw;
-  /* currentColor drives the gradient so tones are one declaration each. Profile approximates
-     a gaussian: saturated plateau, then a long soft tail. */
+  /* Every glow on the site is Primary — Figma tints three of them amber, but a single accent
+     colour is what makes them read as one system rather than as decoration. Profile
+     approximates a gaussian: saturated plateau, then a long soft tail. */
+  color: var(--color-brand-09);
   background: radial-gradient(
     circle closest-side,
     color-mix(in srgb, currentColor 78%, transparent) 0%,
@@ -14,12 +14,4 @@
     transparent 80%
   );
   pointer-events: none;
-}
-
-.brand {
-  color: var(--color-brand-09);
-}
-
-.amber {
-  color: var(--color-glow-amber);
 }

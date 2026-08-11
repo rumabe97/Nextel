@@ -27,6 +27,11 @@ export function Contact({ dictionary, locale }: ContactProps) {
       {/* Ellipse #2002:1505: 381px blue @57%, top-right corner. */}
       <Glow className={styles.cornerGlow} opacity={0.57} size={381} />
 
+      {/* Not in Figma. Its one ellipse sits in the top-right corner, leaving the form side
+          unlit; this balances it low and left, well under the form's own contrast. */}
+      <Glow className={styles.midGlow} opacity={0.16} size={380} />
+      <Glow className={styles.formGlow} opacity={0.2} size={400} />
+
       <div className={styles.inner}>
         <div className={styles.aside}>
           <Eyebrow>{contact.eyebrow}</Eyebrow>

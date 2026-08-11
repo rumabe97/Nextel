@@ -1,18 +1,27 @@
-/* Figma 05: blue #417:6475 centre 7.7%, amber #417:6483 centre 79.6%. */
+/* Figma 05: #417:6475 centre 7.7%, #417:6483 centre 79.6%. Figma tints the right-hand pair
+   amber; the site keeps a single Primary palette, so every glow is brand blue. */
 .headerGlowBlue {
   top: 70%;
   left: 7.7%;
-}
-
-.headerGlowAmber {
-  top: 80%;
-  left: 79.6%;
 }
 
 /* Ellipse #417:6476 — centre 92.6%, top of the page. */
 .headerGlowTop {
   top: 2rem;
   left: 92.6%;
+}
+
+/* Figma #417:6483, relocated — see Why.tsx. Right side, on the CTA's midline. */
+.ctaGlow {
+  top: 50%;
+  left: 84%;
+}
+
+/* Not in Figma — see Why.tsx. Centre: at 89% it sat 52px in x under .headerGlowTop, and the
+   two read as one column of light down the right edge. */
+.reasonsGlow {
+  top: 48%;
+  left: 50%;
 }
 
 .reasons {
@@ -60,6 +69,15 @@
   color: var(--foreground-02);
   font-size: var(--font-size-03);
   line-height: var(--line-height-05);
+}
+
+/* Not in Figma — see Why.tsx. Left side, alternating against .reasonsGlow above it.
+   Stays on the midline: .headerGlowBlue holds the same column 943px above, and pulling this
+   one higher to close the gap below put the two within 1.39 of merging. This page is the
+   shortest on the site and already carries five, so the gap stays rather than a sixth. */
+.commitmentsGlow {
+  top: 50%;
+  left: 9%;
 }
 
 .commitments {

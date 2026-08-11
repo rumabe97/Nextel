@@ -3,6 +3,7 @@ import styles from './Legal.module.css';
 import { fill } from 'i18n/getDictionary';
 
 import { Eyebrow } from 'components/Eyebrow';
+import { Glow } from 'components/Glow';
 import { PageSection } from 'components/PageSection';
 
 import { getContactEmail } from 'lib/contactEmail';
@@ -22,6 +23,16 @@ export function Legal({ copy }: LegalProps) {
 
   return (
     <PageSection>
+      {/* Not in Figma — there is no privacy frame. The corner one matches Contact's
+          #2002:1505 (381px @57%) so the page reads as part of the same system; the other two
+          carry that down a 2819px column that otherwise had a single light at the very top.
+          Alternating sides, and dimmer than the corner, because this page is a wall of text
+          and the glows must stay behind it. */}
+      <Glow className={styles.cornerGlow} opacity={0.57} size={381} />
+      <Glow className={styles.upperGlow} opacity={0.17} size={390} />
+      <Glow className={styles.midGlow} opacity={0.2} size={420} />
+      <Glow className={styles.footGlow} opacity={0.18} size={400} />
+
       <article className={styles.document}>
         <header className={styles.header}>
           <Eyebrow>{copy.eyebrow}</Eyebrow>
