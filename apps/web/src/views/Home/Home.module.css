@@ -18,14 +18,17 @@
   isolation: isolate;
 }
 
-/* Shorter than the viewport on a phone. Paired with .introSection's matching top padding
+/* Roughly two-thirds of the screen on a phone. `min-height` means this is a floor, not a cap:
+   on a very small handset where the tagline and mark need more than 70svh the hero simply
+   grows to fit them, so the type is never squeezed.
+   Paired with .introSection's matching top padding
    below: the hero centres its content, so every pixel taken off its height is split half above
    and half below the tagline and drags the copy underneath up with it. Shrinking the hero
    alone is what made that copy feel cramped last time — the two have to move together. */
 @media (max-width: 48rem) {
   .hero {
-    min-height: min(80vh, 56rem);
-    min-height: min(80svh, 56rem);
+    min-height: min(70vh, 56rem);
+    min-height: min(70svh, 56rem);
   }
 }
 
@@ -84,8 +87,8 @@
    first line of the paragraph in view on all of them. */
 @media (max-width: 48rem) {
   .introSection {
-    padding-top: calc(var(--section-gap) + 8vh);
-    padding-top: calc(var(--section-gap) + 8svh);
+    padding-top: calc(var(--section-gap) + 4vh);
+    padding-top: calc(var(--section-gap) + 4svh);
   }
 }
 
