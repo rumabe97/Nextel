@@ -1,0 +1,112 @@
+/* Sits at the foot of the intro column, opened by the same Primary-fading hairline the intro
+   block itself uses — so the section reads as one stack rather than two competing widths.
+   margin-top only, and a modest one: .intro is a flex column with its own 24px gap, so the
+   strip already starts 24px below the CTA. Adding a 40px margin AND 32px of padding on top of
+   that opened ~96px of dead space between the two. */
+.strip {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-06);
+  gap: var(--space-05);
+}
+
+.strip::before {
+  height: 1px;
+  background: linear-gradient(90deg, var(--color-brand-09) 26%, transparent 100%);
+  content: '';
+}
+
+/* The site's eyebrow treatment: Rubik Light, uppercase, wide tracking, secondary grey. Left,
+   because everything above it in this column is left-aligned. */
+.label {
+  color: var(--foreground-02);
+  font-size: var(--font-size-01);
+  font-weight: var(--font-weight-light);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+}
+
+/* Equal columns, so the tiles stay identical however many there are and whatever shape the
+   logos inside them happen to be. */
+.list {
+  display: grid;
+  /* 8rem, not 9: at 9rem two tiles plus the gap no longer fit a 390px phone's column and the
+     pair dropped to one per row. 8rem keeps them side by side down to ~360px and only stacks
+     on the very narrowest screens, where stacking is the better answer anyway. */
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: var(--space-04);
+  list-style: none;
+}
+
+/* Fade up on entry, staggered — the same gesture SectionHeading and TaglineBand use, so the
+   strip arrives as part of the page rather than as a widget bolted onto it.
+   --client-step comes from the component: 0, 1, 2 … */
+.item {
+  display: flex;
+  opacity: 0;
+  transform: translateY(0.5rem);
+  transition:
+    opacity var(--duration-slow) var(--ease-default),
+    transform var(--duration-slow) var(--ease-default);
+  transition-delay: calc(var(--client-step, 0) * 110ms);
+}
+
+.visible .item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* The tile is the click target and the affordance: a bare logo gives no signal that it is
+   interactive. Barely-there at rest so the row stays quiet against the page. */
+.tile {
+  display: grid;
+  width: 100%;
+  padding: var(--space-06) var(--space-05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-03);
+  background: rgba(255, 255, 255, 0.02);
+  place-items: center;
+  transition:
+    border-color var(--duration-fast) var(--ease-default),
+    background var(--duration-fast) var(--ease-default),
+    transform var(--duration-normal) var(--ease-default);
+}
+
+.tile:hover,
+.tile:focus-visible {
+  border-color: rgba(39, 147, 193, 0.55);
+  background: rgba(39, 147, 193, 0.07);
+  transform: translateY(-2px);
+}
+
+/* Height is per-logo (--client-optical, set inline) so the marks balance by ink rather than by
+   bounding box; width follows to keep each one's aspect ratio.
+   Greyscale so neither client's palette outshouts Nextel's own — see the note in the
+   component for why this cannot be a white-out filter. */
+.logo {
+  width: auto;
+  height: var(--client-optical, 40px);
+  filter: grayscale(1);
+  opacity: 0.75;
+  transition:
+    filter var(--duration-normal) var(--ease-default),
+    opacity var(--duration-fast) var(--ease-default);
+}
+
+.tile:hover .logo,
+.tile:focus-visible .logo {
+  filter: grayscale(0);
+  opacity: 1;
+}
+
+/* Narrow phones: the tiles keep their grid but need less padding, and the logos come down with
+   them so two still sit side by side rather than dropping to one per row. */
+@media (max-width: 30rem) {
+  .tile {
+    padding: var(--space-05) var(--space-04);
+  }
+
+  .logo {
+    height: calc(var(--client-optical, 40px) * 0.8);
+  }
+}

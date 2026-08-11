@@ -7,6 +7,7 @@ import styles from './Home.module.css';
 import { Link } from 'ui/components/Link';
 import { pathFor, SERVICE_ANCHORS } from 'i18n/config';
 
+import { ClientStrip } from 'components/ClientStrip';
 import { Eyebrow } from 'components/Eyebrow';
 import { Glow } from 'components/Glow';
 import { HeroTagline } from 'components/HeroTagline';
@@ -53,6 +54,12 @@ export function Home({ dictionary, locale }: HomeProps) {
             {dictionary.common.contactAdvisor}
             <Icon className={styles.introCtaIcon} name="arrowRight" />
           </Link>
+
+          {/* Not in Figma. Directly under the hero, which is where a credibility signal has to
+              land, and inside the intro column so it shares that column's width and left edge —
+              spanning the full section instead put a wide centred band under narrow left-aligned
+              copy, which is what made it look off-centre. */}
+          <ClientStrip label={home.clients.label} />
         </div>
       </PageSection>
 

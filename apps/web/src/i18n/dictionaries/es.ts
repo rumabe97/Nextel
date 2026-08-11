@@ -88,6 +88,7 @@ export const es = {
   },
 
   home: {
+    clients: { label: 'Confían en nosotros' },
     description:
       'Nextel Advisors — consultoría, intermediación y captación comercial para el sector de las telecomunicaciones. Contratación de nueva planta y Site Management.',
     intro: { lead: 'Consultoría especializada en servicios de intermediación y captación comercial para el sector de las telecomunicaciones.' },

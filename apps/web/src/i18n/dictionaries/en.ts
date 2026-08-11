@@ -81,6 +81,7 @@ export const en: Dictionary = {
   footer: { links: 'Links', other: 'Other', rights: 'All rights reserved', taglinePrimary: 'Connecting today', taglineSecondary: 'Driving tomorrow' },
 
   home: {
+    clients: { label: 'Trusted by' },
     description:
       'Nextel Advisors — consultancy, brokerage and commercial development for the telecommunications sector. New site acquisition and Site Management.',
     intro: { lead: 'Specialist consultancy in brokerage and commercial development services for the telecommunications sector.' },
