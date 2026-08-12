@@ -10,10 +10,44 @@
   text-align: center;
 }
 
+/* The portrait answers a pointer anywhere on the card, not only on the icon row at the very
+   bottom — that row is a 16px target in a card several hundred pixels tall, and hovering the
+   face and getting nothing back makes the card read as flat artwork. */
 .avatar {
   width: clamp(9rem, 18vw, 13.75rem);
   height: clamp(9rem, 18vw, 13.75rem);
   margin-bottom: var(--space-04);
+  transition: transform var(--duration-normal) var(--ease-emphasis);
+}
+
+/* The monogram disc standing in for a portrait. Quiet by design — a raised surface, a hairline
+   and secondary-grey type, so a roster of placeholders reads as a considered grid rather than
+   as three missing images. It answers the card's hover along with the avatar itself, which is
+   what keeps it from looking like a static asset that happens to be sitting there. */
+.initials {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--border-01);
+  border-radius: var(--radius-full);
+  background: var(--background-02);
+  color: var(--foreground-02);
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  place-items: center;
+  transition:
+    border-color var(--duration-normal) var(--ease-default),
+    background var(--duration-normal) var(--ease-default),
+    color var(--duration-normal) var(--ease-default);
+}
+
+.card:hover .initials,
+.card:focus-within .initials {
+  border-color: rgba(39, 147, 193, 0.5);
+  background: var(--background-highlight);
+  color: var(--foreground-01);
 }
 
 .name {
@@ -43,9 +77,18 @@
   place-items: center;
   color: var(--foreground-02);
   font-size: 1rem;
-  transition: color var(--duration-fast) var(--ease-default);
+  transition:
+    color var(--duration-fast) var(--ease-default),
+    transform var(--duration-normal) var(--ease-emphasis);
 }
 
-.socialLink:hover {
+.socialLink:hover,
+.socialLink:focus-visible {
   color: var(--color-brand-09);
+  transform: translateY(-2px) scale(1.12);
+}
+
+.card:hover .avatar,
+.card:focus-within .avatar {
+  transform: scale(1.03);
 }

@@ -1,11 +1,10 @@
-'use client';
-import { useEffect, useRef, useState } from 'react';
-
 import Image from 'next/image';
 
 import styles from './ClientStrip.module.css';
 
 import { Link } from 'ui/components/Link';
+
+import { Reveal } from 'components/Reveal';
 
 import type { CSSProperties } from 'react';
 
@@ -60,38 +59,19 @@ export interface ClientStripProps {
 // inert or point them at a case study; with no case studies to point at, the company site is
 // the only destination that is not a dead end, and the tile gives the click an obvious target.
 export function ClientStrip({ label }: ClientStripProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const node = ref.current;
-
-    if (!node) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries.some(entry => entry.isIntersecting)) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.4 }
-    );
-
-    observer.observe(node);
-
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <div className={visible ? `${styles.strip} ${styles.visible}` : styles.strip} ref={ref}>
+    <div className={styles.strip}>
       <p className={styles.label}>{label}</p>
 
-      <ul className={styles.list}>
-        {CLIENTS.map((client, index) => (
-          <li className={styles.item} key={client.name} style={{ '--client-step': index } as CSSProperties}>
+      {/* The tiles arrive one after the other through the shared Reveal, which replaces the
+          IntersectionObserver this component used to run for itself — one observer serves
+          every reveal on the page, and the staggering is the same gesture the rest of the
+          site uses rather than a second one that only looks similar.
+          This component is a Server Component again as a result: the only thing that needed
+          the browser was that observer, and it now lives in the one client leaf. */}
+      <Reveal as="ul" className={styles.list} stagger={true}>
+        {CLIENTS.map(client => (
+          <li className={styles.item} key={client.name}>
             {/* The DS Link adds rel="noopener noreferrer" for target="_blank" on its own. */}
             <Link className={styles.tile} href={client.href} target="_blank">
               <Image
@@ -107,7 +87,7 @@ export function ClientStrip({ label }: ClientStripProps) {
             </Link>
           </li>
         ))}
-      </ul>
+      </Reveal>
     </div>
   );
 }

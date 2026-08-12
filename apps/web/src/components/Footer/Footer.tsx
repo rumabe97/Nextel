@@ -4,6 +4,7 @@ import { Link } from 'ui/components/Link';
 
 import { Icon } from 'components/Icon';
 import { Logo } from 'components/Logo';
+import { Reveal } from 'components/Reveal';
 
 import { buildFooterLinks, buildLegalLinks } from 'lib/navigation';
 import { getContactEmail } from 'lib/contactEmail';
@@ -21,7 +22,10 @@ export function Footer({ dictionary, locale }: FooterProps) {
 
   return (
     <footer className={styles.footer}>
-      <div className={styles.inner}>
+      {/* Staggered across the four columns, left to right — the footer is the one block on
+          the site the visitor always arrives at by scrolling, so it is the safest place for
+          motion and the only one guaranteed to be seen in the right order. */}
+      <Reveal className={styles.inner} stagger={true}>
         <div className={styles.tagline}>
           <p className={styles.taglinePrimary}>{dictionary.footer.taglinePrimary}</p>
           <p className={styles.taglineSecondary}>{dictionary.footer.taglineSecondary}</p>
@@ -63,7 +67,7 @@ export function Footer({ dictionary, locale }: FooterProps) {
         </nav>
 
         <Logo className={styles.watermark} variant="mark" />
-      </div>
+      </Reveal>
 
       <p className={styles.copyright}>
         ©{new Date().getFullYear()} <strong className={styles.copyrightBrand}>Nextel Advisors</strong> {dictionary.footer.rights}

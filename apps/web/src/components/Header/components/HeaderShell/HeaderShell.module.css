@@ -1,3 +1,15 @@
+/* The scroll probe. 8px tall, matching the threshold the header used to read from
+   `window.scrollY`: while any of it is still on screen the page is at the top.
+   Invisible and untouchable — it paints nothing and takes no pointer events. */
+.sentinel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 8px;
+  pointer-events: none;
+}
+
 /* Fixed overlay, not sticky-in-flow: Figma paints the header ON TOP of the hero image.
    Keeping it in the flow left a page-background strip above the hero — the "black gap". */
 .header {
@@ -15,9 +27,22 @@
 
 /* Scrolled state: Figma only specifies the top-of-page look, so this is the "always looks
    good" fallback — a dark glass wash that keeps white 18px nav text readable over any
-   section that passes underneath. */
+   section that passes underneath.
+   The bar also draws itself in as it condenses, so the change is a movement rather than a
+   background switching on. */
 .scrolled {
   border-bottom-color: var(--border-01);
   background: var(--color-glass);
   backdrop-filter: blur(14px);
+
+  /* Read by .inner and .logo in Header.module.css. A custom property rather than a rule on
+     `.inner` directly, because that class lives in another CSS Module and its name is hashed
+     — there is nothing here that could name it. Custom properties inherit, which crosses the
+     module boundary cleanly.
+
+     Deliberately NOT a change to --header-height: `main` offsets its whole content by that
+     token, so animating it would drag the entire page up by 16px on the first scroll — a
+     layout shift, on scroll, on every page. Only the bar's own box condenses; the space
+     reserved for it never moves. */
+  --header-shrink: 0.86;
 }

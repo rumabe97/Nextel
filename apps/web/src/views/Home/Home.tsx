@@ -14,6 +14,7 @@ import { HeroTagline } from 'components/HeroTagline';
 import { HeroVideo } from 'components/HeroVideo';
 import { Icon } from 'components/Icon';
 import { PageSection } from 'components/PageSection';
+import { Reveal } from 'components/Reveal';
 import { SectionHeading } from 'components/SectionHeading';
 import { ServiceCard } from 'components/ServiceCard';
 import { TaglineBand } from 'components/TaglineBand';
@@ -47,7 +48,11 @@ export function Home({ dictionary, locale }: HomeProps) {
         {/* Ellipse #2007:802: 780px blue glow, 30%, off the right edge at the hero seam. */}
         <Glow className={styles.introGlow} opacity={0.3} size={780} />
 
-        <div className={styles.intro}>
+        {/* stagger, not a plain reveal: the lead, its rule and the CTA are a sequence the eye
+            already reads top to bottom, and arriving in that order is what makes the block
+            feel composed rather than pasted in. The hero above is deliberately left alone —
+            it is the LCP element and must paint on the first frame. */}
+        <Reveal className={styles.intro} stagger={true}>
           <p className={styles.introLead}>{home.intro.lead}</p>
           <div className={styles.introRule} />
           <Link className={styles.introCta} href={pathFor('contact', locale)}>
@@ -60,7 +65,7 @@ export function Home({ dictionary, locale }: HomeProps) {
               spanning the full section instead put a wide centred band under narrow left-aligned
               copy, which is what made it look off-centre. */}
           <ClientStrip label={home.clients.label} />
-        </div>
+        </Reveal>
       </PageSection>
 
       <PageSection divided={true}>
@@ -70,14 +75,19 @@ export function Home({ dictionary, locale }: HomeProps) {
         <Glow className={styles.positioningGlow} opacity={0.17} size={400} />
 
         <div className={styles.positioning}>
-          <div className={styles.positioningBody}>
+          {/* The two halves come in from the sides they sit on, so the pairing itself is what
+              animates — copy from the left, graphic from the right, meeting in the middle.
+              Two Reveals rather than one, because the direction has to differ. */}
+          <Reveal className={styles.positioningBody} variant="left">
             <Eyebrow>{home.positioning.eyebrow}</Eyebrow>
             <h2 className={styles.positioningTitle}>{home.positioning.title}</h2>
             <p className={styles.positioningNote}>{home.positioning.note}</p>
-          </div>
+          </Reveal>
 
           {/* Figma "Img" #417:5658 — the hexagon + lightning graphic, right of the copy. */}
-          <Image alt="" className={styles.positioningMark} height={521} src="/images/hex-lightning.svg" unoptimized={true} width={482} />
+          <Reveal className={styles.positioningMarkReveal} variant="right">
+            <Image alt="" className={styles.positioningMark} height={521} src="/images/hex-lightning.svg" unoptimized={true} width={482} />
+          </Reveal>
         </div>
       </PageSection>
 
@@ -87,11 +97,13 @@ export function Home({ dictionary, locale }: HomeProps) {
             opacity, so it balances the pair above rather than competing with them. */}
         <Glow className={styles.servicesGlow} opacity={0.22} size={440} />
 
-        <SectionHeading align="center" eyebrow={home.services.eyebrow} stackedEyebrow={true}>
-          {home.services.heading}
-        </SectionHeading>
+        <Reveal>
+          <SectionHeading align="center" eyebrow={home.services.eyebrow} stackedEyebrow={true}>
+            {home.services.heading}
+          </SectionHeading>
+        </Reveal>
 
-        <div className={styles.services}>
+        <Reveal className={styles.services} stagger={true}>
           <ServiceCard
             href={pathFor('services', locale, SERVICE_ANCHORS.newPlant)}
             image="/images/service-new-plant.webp"
@@ -104,7 +116,7 @@ export function Home({ dictionary, locale }: HomeProps) {
             index="02"
             title={dictionary.serviceMenu.siteManagement}
           />
-        </div>
+        </Reveal>
       </PageSection>
 
       <PageSection className={styles.statementsSection} divided={true}>
@@ -112,12 +124,16 @@ export function Home({ dictionary, locale }: HomeProps) {
         <Glow className={styles.statementsGlow} opacity={0.59} size={376} />
 
         {/* Figma staggers the four statements diagonally (~210px per step), each opening
-            with a 416px transparent→Primary gradient rule. */}
+            with a 416px transparent→Primary gradient rule.
+            Each gets its own Reveal rather than one staggered list: the four are spread over
+            roughly a full screen of height, so a single trigger would fire them all while
+            the last two are still well below the fold and their motion would be spent before
+            anyone saw it. Slid in from the left, along the same diagonal the layout steps. */}
         <ol className={styles.statements}>
           {home.statements.map((statement, index) => (
-            <li className={styles.statement} key={statement} style={{ '--statement-step': index } as CSSProperties}>
+            <Reveal as="li" className={styles.statement} key={statement} style={{ '--statement-step': index } as CSSProperties} variant="left">
               <p className={styles.statementText}>{statement}</p>
-            </li>
+            </Reveal>
           ))}
         </ol>
       </PageSection>

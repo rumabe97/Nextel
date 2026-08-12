@@ -73,6 +73,12 @@
   /* Every row holds its line. Row 2 was previously the only one without this, so at 320px
      "hoy, impulsamos" wrapped and the three-row lockup silently became four. */
   white-space: nowrap;
+}
+
+/* Gated on `.animated`, which the component adds only on a cold load — see the note there.
+   The rows are laid out and legible without it; this is purely the arrival. */
+.animated .rowStart,
+.animated .rowEnd {
   animation: taglineIn 0.9s var(--ease-default) both;
 }
 

@@ -39,12 +39,49 @@
 }
 
 .reason {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-04);
   padding-top: var(--space-05);
-  border-top: 1px solid var(--border-01);
   counter-increment: reason;
+  /* When this pillar's own ornament arrives, relative to the moment the list is revealed: its
+     place in the stagger, plus a beat so the keyline and the numeral land just after the text
+     they belong to rather than alongside it. `--reason-index` is set inline per item. */
+  --reason-beat: calc(var(--reveal-delay, 0ms) + var(--reveal-stagger) * var(--reason-index, 0) + 140ms);
+}
+
+/* The keyline was a plain `border-top`; it is a pseudo-element now so it can draw itself in
+   from the left as its pillar arrives, which is the same gesture the home page's value
+   statements already make. Extending a treatment the site has rather than inventing a second
+   one is what keeps these pages reading as the same document.
+
+   Drawn by default, and only collapsed once Reveal has confirmed it hid this list — keyed the
+   other way round, a pillar that happened to load above the fold would never animate and so
+   would sit under a keyline permanently scaled to nothing. `data-reveal` and `data-revealed`
+   are plain attributes on the Reveal wrapper, which is why a stylesheet here can name them;
+   the class beside them is hashed and unreachable.
+
+   The delay tracks each pillar's own place in the stagger, so a keyline draws just after the
+   text above it lands rather than the four of them going off at once. */
+.reason::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--border-01);
+  content: '';
+  transform-origin: left center;
+}
+
+[data-reveal='hidden'] .reason::after {
+  transform: scaleX(0);
+}
+
+[data-revealed] .reason::after {
+  transform: scaleX(1);
+  transition: transform 0.65s var(--ease-entrance) var(--reason-beat);
 }
 
 /* Ghosted two-digit index above each pillar, matching the "01 / 02" treatment the service
@@ -56,6 +93,32 @@
   font-size: var(--font-size-07);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-01);
+  transform-origin: left center;
+}
+
+/* The numeral rides the same beat as the keyline above it, deliberately: these two are the
+   pillar's ornament and they should read as one gesture. Giving the numeral a beat of its own
+   would make three separate arrivals per item — text, rule, number — which stops looking
+   composed and starts looking like a queue. */
+[data-reveal='hidden'] .reason::before {
+  opacity: 0;
+  transform: scale(0.92);
+}
+
+[data-revealed] .reason::before {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.5s var(--ease-entrance) var(--reason-beat),
+    transform 0.6s var(--ease-entrance) var(--reason-beat);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal='hidden'] .reason::after,
+  [data-reveal='hidden'] .reason::before {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .reasonTitle {
@@ -109,6 +172,9 @@
   line-height: var(--line-height-02);
 }
 
+/* The site's primary pill, and the same gesture the contact form's submit uses: lift, and
+   cast the brand colour underneath as it rises. The shadow is what sells the lift — a plain
+   translate on a flat page just looks like the element twitched. */
 .ctaLink {
   display: inline-flex;
   flex-shrink: 0;
@@ -117,16 +183,29 @@
   padding: var(--space-04) var(--space-07);
   border-radius: var(--radius-full);
   background: var(--color-brand-09);
+  box-shadow: 0 0 0 0 rgba(39, 147, 193, 0);
   color: var(--color-white);
   font-size: var(--font-size-03);
   font-weight: var(--font-weight-medium);
-  transition: background var(--duration-fast) var(--ease-default);
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    box-shadow var(--duration-normal) var(--ease-entrance),
+    transform var(--duration-normal) var(--ease-emphasis);
 }
 
-.ctaLink:hover {
+.ctaLink:hover,
+.ctaLink:focus-visible {
   background: var(--color-brand-10);
+  box-shadow: 0 10px 26px -10px rgba(39, 147, 193, 0.85);
+  transform: translateY(-2px);
 }
 
 .ctaIcon {
   font-size: 0.875rem;
+  transition: transform var(--duration-normal) var(--ease-entrance);
+}
+
+.ctaLink:hover .ctaIcon,
+.ctaLink:focus-visible .ctaIcon {
+  transform: translateX(3px);
 }

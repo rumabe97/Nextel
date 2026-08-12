@@ -3,7 +3,16 @@
 .hero {
   position: relative;
   display: grid;
+  /* `clip`, not `hidden`, and this is load-bearing for the parallax rather than cosmetic.
+     `overflow: hidden` makes an element a scroll container, and `animation-timeline: view()`
+     resolves against the subject's nearest scroll container — so the hero's own clip was
+     silently capturing the video's timeline and pinning it to a box that never scrolls. The
+     animation ran, at a frozen 50%, forever. `clip` crops identically without creating a
+     scroll container, so the timeline reaches the document where it belongs.
+     `hidden` stays first as the fallback for Safari before 16; anything that lacks `clip`
+     also lacks scroll-driven animations, so it never had the problem to begin with. */
   overflow: hidden;
+  overflow: clip;
   /* svh, not vh. On iOS Safari `100vh` is the LARGE viewport — the height the page gets once
      the address bar has retracted — so a 100vh hero is about 99px taller than what is actually
      on screen when the page loads, and you scroll a whole thumb-length still looking at hero.
@@ -137,16 +146,28 @@
   font-weight: var(--font-weight-light);
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
-  transition: gap var(--duration-fast) var(--ease-default);
+  transition:
+    color var(--duration-fast) var(--ease-default),
+    gap var(--duration-normal) var(--ease-entrance);
 }
 
-.introCta:hover {
+.introCta:hover,
+.introCta:focus-visible {
+  color: var(--color-brand-11);
   gap: var(--space-06);
 }
 
+/* The gap opening already moves the arrow; this moves it again, in the same direction, so the
+   whole link reads as being drawn to the right rather than merely spacing out. */
 .introCtaIcon {
   flex-shrink: 0;
   font-size: 0.75em;
+  transition: transform var(--duration-normal) var(--ease-entrance);
+}
+
+.introCta:hover .introCtaIcon,
+.introCta:focus-visible .introCtaIcon {
+  transform: translateX(3px);
 }
 
 /* ── Positioning (Figma "About" #417:5661) ────────────────────────────── */
@@ -188,15 +209,20 @@
   line-height: 1.45;
 }
 
-/* Figma: 511×521 at 1920. Hidden on small screens where it would crowd the copy. */
-.positioningMark {
+/* Figma: 511×521 at 1920. Hidden on small screens where it would crowd the copy.
+   The visibility and grid placement live on the Reveal wrapper, since that is what is now the
+   grid item; the image inside it only carries its own size. */
+.positioningMarkReveal {
   display: none;
+}
+
+.positioningMark {
   width: clamp(16rem, 26vw, 31rem);
   height: auto;
 }
 
 @media (min-width: 64rem) {
-  .positioningMark {
+  .positioningMarkReveal {
     display: block;
     justify-self: center;
   }
@@ -240,7 +266,16 @@
   max-width: 1063px;
 }
 
-/* Each statement opens with a 416px transparent→Primary rule (#2045:229…237). */
+/* Each statement opens with a 416px transparent→Primary rule (#2045:229…237).
+   The rule draws itself left to right as the statement arrives, a beat behind the text, so it
+   reads as underscoring the line rather than as a second thing sliding in beside it.
+
+   Drawn by default and only collapsed once Reveal has confirmed it hid this <li>. Keying it
+   the other way round — hidden by default, revealed on `[data-revealed]` — would leave the
+   rule permanently invisible under a statement that happened to load above the fold and so
+   never animates at all. Both flags are plain attributes written by the Reveal wrapper onto
+   this same element, which is why a stylesheet over here can name them; the classes beside
+   them are hashed and cannot be reached. */
 .statement::before {
   display: block;
   width: min(416px, 100%);
@@ -248,6 +283,22 @@
   margin-bottom: var(--space-04);
   background: linear-gradient(90deg, var(--color-brand-09) 0%, transparent 100%);
   content: '';
+  transform-origin: left center;
+}
+
+.statement[data-reveal='hidden']::before {
+  transform: scaleX(0);
+}
+
+.statement[data-revealed]::before {
+  transform: scaleX(1);
+  transition: transform 0.7s var(--ease-entrance) 0.15s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statement[data-reveal='hidden']::before {
+    transform: none;
+  }
 }
 
 /* Diagonal stagger, ~210px per step at desktop (x: 302/512/722/930 in Figma). */

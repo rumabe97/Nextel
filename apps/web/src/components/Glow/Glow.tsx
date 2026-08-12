@@ -35,6 +35,54 @@ function responsiveDiameter(rendered: number) {
   return `min(${rendered}px, calc(${base.toFixed(2)}px + ${(slope * 100).toFixed(4)}vw))`;
 }
 
+/** Slowest and fastest a glow may complete one drift cycle, in seconds. Both deliberately
+ *  long: at this speed nobody watches a glow move, they only notice that the page is not a
+ *  flat image. Anything under ~15s starts to read as something breathing at you. */
+const DRIFT_MIN_SECONDS = 22;
+const DRIFT_SPAN_SECONDS = 9;
+
+/** Travel at the midpoint of the cycle, as a percentage of the glow's own diameter. */
+const DRIFT_MIN_TRAVEL = 1.5;
+const DRIFT_SPAN_TRAVEL = 1.6;
+
+/** FNV-1a, 32-bit. It only has to spread a handful of strings evenly — nothing here is
+ *  security-sensitive, and it has to be deterministic so the server and the client agree. */
+function hash(input: string) {
+  let value = 0x81_1c_9d_c5;
+
+  for (let index = 0; index < input.length; index += 1) {
+    value ^= input.charCodeAt(index);
+    value = Math.imul(value, 0x01_00_01_93);
+  }
+
+  return value >>> 0;
+}
+
+/** Everything that makes one glow drift differently from its neighbours, derived rather than
+ *  passed in: the alternative is a phase prop on all two dozen call sites, which is a lot of
+ *  noise for a number nobody will ever want to choose deliberately.
+ *
+ *  The seed is the glow's positioning class plus its size and opacity, which together are
+ *  unique per glow on a page. The class name is hashed by CSS Modules and so changes between
+ *  builds — that only reshuffles which glow gets which phase, which is not something anyone
+ *  can perceive.
+ *
+ *  A negative delay is the point of the whole exercise: it starts each glow part-way through
+ *  its own cycle, so they are already out of step on the first frame. Left in phase, two dozen
+ *  lights pulsing together would read as the page flickering. */
+function drift(seed: number) {
+  const duration = DRIFT_MIN_SECONDS + (seed % DRIFT_SPAN_SECONDS);
+  const travel = (offset: number) =>
+    ((seed >> offset) % 2 === 0 ? 1 : -1) * (DRIFT_MIN_TRAVEL + ((seed >> (offset + 2)) % 17) * (DRIFT_SPAN_TRAVEL / 17));
+
+  return {
+    '--glow-delay': `-${seed % duration}s`,
+    '--glow-drift-x': `${travel(5).toFixed(2)}%`,
+    '--glow-drift-y': `${travel(13).toFixed(2)}%`,
+    '--glow-duration': `${duration}s`
+  };
+}
+
 // Figma scatters ELLIPSE nodes with `filter: blur(200–250px)` behind sections. A gaussian
 // blur that large pushes light well beyond the ellipse bounds, so the halo is rendered at
 // 1.5× the nominal diameter with a plateau-then-falloff gradient — visually equivalent to
@@ -46,7 +94,13 @@ export function Glow({ className, opacity = 1, size }: GlowProps) {
   // container's, and keeps doing so as the diameter scales with the viewport. Positioning by
   // a percentage of the container instead is what let the home intro glow bury a third of
   // itself behind the hero, where the seam sliced it with a hard straight edge.
-  const style = { '--glow-radius': `calc(${diameter} / 2)`, height: diameter, opacity, width: diameter } as CSSProperties;
+  const style = {
+    '--glow-radius': `calc(${diameter} / 2)`,
+    ...drift(hash(`${className ?? ''}|${size}|${opacity}`)),
+    height: diameter,
+    opacity,
+    width: diameter
+  } as CSSProperties;
 
   return <div aria-hidden={true} className={[styles.glow, className].filter(Boolean).join(' ')} style={style} />;
 }

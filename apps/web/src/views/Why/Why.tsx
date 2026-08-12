@@ -8,9 +8,11 @@ import { pathFor } from 'i18n/config';
 import { Glow } from 'components/Glow';
 import { Icon } from 'components/Icon';
 import { PageSection } from 'components/PageSection';
+import { Reveal } from 'components/Reveal';
 import { SectionHeading } from 'components/SectionHeading';
 import { StatBlock } from 'components/StatBlock';
 
+import type { CSSProperties } from 'react';
 import type { Dictionary } from 'i18n/dictionaries/es';
 import type { Locale } from 'i18n/config';
 
@@ -44,14 +46,16 @@ export function Why({ dictionary, locale }: WhyProps) {
             the fold ran dark — 84% of the page. */}
         <Glow className={styles.reasonsGlow} opacity={0.22} size={440} />
 
-        <ol className={styles.reasons}>
-          {why.reasons.map(reason => (
-            <li className={styles.reason} key={reason.title}>
+        <Reveal as="ol" className={styles.reasons} stagger={true}>
+          {why.reasons.map((reason, index) => (
+            // The index is published so the keyline above each pillar can draw itself in on
+            // that pillar's own beat of the stagger rather than all four at once.
+            <li className={styles.reason} key={reason.title} style={{ '--reason-index': index } as CSSProperties}>
               <h2 className={styles.reasonTitle}>{reason.title}</h2>
               <p className={styles.reasonBody}>{reason.body}</p>
             </li>
           ))}
-        </ol>
+        </Reveal>
       </PageSection>
 
       <PageSection divided={true}>
@@ -59,11 +63,11 @@ export function Why({ dictionary, locale }: WhyProps) {
             Figma lights only its header. */}
         <Glow className={styles.commitmentsGlow} opacity={0.2} size={420} />
 
-        <div className={styles.commitments}>
+        <Reveal className={styles.commitments} stagger={true}>
           <SectionHeading eyebrow={why.commitment.eyebrow}>{why.commitment.heading}</SectionHeading>
 
           <StatBlock stats={why.commitment.stats} />
-        </div>
+        </Reveal>
       </PageSection>
 
       <PageSection divided={true}>
@@ -73,13 +77,13 @@ export function Why({ dictionary, locale }: WhyProps) {
             page's last dark stretch, so the same three Figma glows now span the page. */}
         <Glow className={styles.ctaGlow} opacity={0.6} size={376} />
 
-        <div className={styles.cta}>
+        <Reveal className={styles.cta} stagger={true}>
           <p className={styles.ctaTitle}>{why.cta.title}</p>
           <Link className={styles.ctaLink} href={pathFor('contact', locale)}>
             {dictionary.common.contactAdvisor}
             <Icon className={styles.ctaIcon} name="arrowRight" />
           </Link>
-        </div>
+        </Reveal>
       </PageSection>
     </Fragment>
   );

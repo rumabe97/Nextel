@@ -5,6 +5,8 @@ import Image from 'next/image';
 
 import styles from './HeroVideo.module.css';
 
+import { blurred } from 'lib/blurData';
+
 const VIDEO_SRC = '/videos/hero.mp4';
 
 // Readiness milestones. Each one is a moment where a previously-refused play() may now be
@@ -216,31 +218,35 @@ export function HeroVideo() {
   }, []);
 
   return (
+    // Two boxes, not one: the outer is the hero's own footprint and anchors the parallax
+    // timeline, the inner is the oversized thing that actually travels. See the stylesheet.
     <div className={styles.media}>
-      {/* Rendered before the poster so the poster paints on top of it. `src` is set in the
-          ref, not here — see mountVideo. */}
-      {showVideo ? (
-        <video
-          aria-hidden={true}
-          autoPlay={true}
-          className={styles.video}
-          loop={true}
-          muted={true}
-          playsInline={true}
-          preload="auto"
-          ref={mountVideo}
-          tabIndex={-1}
-        />
-      ) : null}
+      <div className={styles.frame}>
+        {/* Rendered before the poster so the poster paints on top of it. `src` is set in the
+            ref, not here — see mountVideo. */}
+        {showVideo ? (
+          <video
+            aria-hidden={true}
+            autoPlay={true}
+            className={styles.video}
+            loop={true}
+            muted={true}
+            playsInline={true}
+            preload="auto"
+            ref={mountVideo}
+            tabIndex={-1}
+          />
+        ) : null}
 
-      <Image
-        alt=""
-        className={playing ? `${styles.poster} ${styles.posterHidden}` : styles.poster}
-        fill={true}
-        priority={true}
-        sizes="100vw"
-        src="/images/home-hero.webp"
-      />
+        <Image
+          alt=""
+          className={playing ? `${styles.poster} ${styles.posterHidden}` : styles.poster}
+          fill={true}
+          priority={true}
+          sizes="100vw"
+          {...blurred('/images/home-hero.webp')}
+        />
+      </div>
     </div>
   );
 }

@@ -1,0 +1,27 @@
+/* 0.42s and 12px: long enough to register as the page having changed, short enough that a
+   visitor clicking through four pages never waits on it. `backwards` and not `both` is
+   deliberate — `backwards` applies the opening frame before the animation starts (no flash of
+   un-animated content on the first frame) while leaving nothing behind once it ends, so the
+   wrapper stops being a containing block the moment it is done and cannot affect the layout
+   of anything inside it for the rest of the visit. */
+.enter {
+  animation: page-enter 0.42s var(--ease-entrance) backwards;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter {
+    animation: none;
+  }
+}

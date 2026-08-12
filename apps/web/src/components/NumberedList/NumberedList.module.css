@@ -13,12 +13,44 @@
 }
 
 .item {
+  position: relative;
   display: flex;
   align-items: flex-start;
   padding-top: var(--space-04);
-  border-top: 1px solid var(--border-01);
   counter-increment: challenge;
   gap: var(--space-04);
+  /* When this row's ornament arrives, relative to the list being revealed. The offset is
+     larger than Why's because the whole list lands as one step of its parent's stagger rather
+     than row by row — the block has to be in place before its rows start marking themselves
+     out. `--item-index` is set inline per row. */
+  --item-beat: calc(var(--reveal-delay, 0ms) + var(--reveal-stagger) * var(--item-index, 0) + 260ms);
+}
+
+/* Was a `border-top`; a pseudo-element instead so it can draw in from the left as the list
+   arrives. See the same treatment on Why's pillars for why it is keyed drawn-by-default and
+   collapsed only once Reveal has confirmed it hid the block.
+
+   The whole list is a single step of its parent's stagger — it is one child of the challenges
+   column, not four — so these four keylines are what carry the internal rhythm, sequenced off
+   each item's own index. */
+.item::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--border-01);
+  content: '';
+  transform-origin: left center;
+}
+
+[data-reveal='hidden'] .item::after {
+  transform: scaleX(0);
+}
+
+[data-revealed] .item::after {
+  transform: scaleX(1);
+  transition: transform 0.6s var(--ease-entrance) var(--item-beat);
 }
 
 .item::before {
@@ -28,6 +60,31 @@
   font-size: var(--font-size-09);
   font-weight: var(--font-weight-bold);
   line-height: var(--line-height-01);
+  transform-origin: left center;
+}
+
+/* The numeral shares its row's keyline beat rather than taking one of its own — the two are a
+   single piece of ornament and should arrive together. See Why's pillars for the same pairing
+   and for why these are keyed drawn-by-default. */
+[data-reveal='hidden'] .item::before {
+  opacity: 0;
+  transform: scale(0.92);
+}
+
+[data-revealed] .item::before {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.5s var(--ease-entrance) var(--item-beat),
+    transform 0.6s var(--ease-entrance) var(--item-beat);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal='hidden'] .item::after,
+  [data-reveal='hidden'] .item::before {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .label {

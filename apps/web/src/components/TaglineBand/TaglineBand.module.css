@@ -28,6 +28,21 @@
   }
 }
 
+/* The Reveal wrapper holding the two lines. It inherits the band's flex column so the lines
+   stack and hug the left edge exactly as they did when they were the band's own children.
+
+   The doubled class buys specificity, not emphasis: `--reveal-shift` is set on Reveal's own
+   `.root` inside a max-width media query, and at one class each the winner would come down to
+   which module's CSS the bundler happened to emit last. 8% of the line's own width is the
+   right travel for display type this large — the token's 1.75rem is calibrated for body copy
+   and would be invisible at 142px, while Figma's variants start these fully off-canvas. */
+.lines.lines {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  --reveal-shift: 8%;
+}
+
 /* Figma #2045:220/222 (style_20553229): Roboto Bold 142 / line-height 166 (1.17), uppercase,
    tight display tracking. The block is LEFT-aligned: line 1 starts at the page edge (x:16),
    line 2 is indented ~125px — the "tab". Line 2 is outline-only: no fill, 1px stroke at
@@ -46,16 +61,11 @@
   letter-spacing: -0.015em;
   line-height: 1.17;
   text-transform: uppercase;
-  transition:
-    opacity var(--duration-slow) var(--ease-default),
-    transform 0.7s var(--ease-default);
   white-space: nowrap;
 }
 
 .filled {
   color: var(--foreground-01);
-  opacity: 0;
-  transform: translateX(-10%);
 }
 
 /* 125px at 142px font ≈ 0.88em — scales with the type at every breakpoint. */
@@ -63,8 +73,6 @@
   -webkit-text-stroke: 1px rgba(255, 255, 255, 0.4);
   margin-left: 0.88em;
   color: transparent;
-  opacity: 0;
-  transform: translateX(10%);
 }
 
 /* The indent is pure decoration but it is bought with type size, since it counts against the
@@ -73,10 +81,4 @@
   .outlined {
     margin-left: 0.4em;
   }
-}
-
-.visible .filled,
-.visible .outlined {
-  opacity: 1;
-  transform: translateX(0);
 }

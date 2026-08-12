@@ -16,6 +16,7 @@
 }
 
 .trigger:hover,
+.trigger:focus-visible,
 .trigger[data-state='open'] {
   color: var(--color-brand-09);
 }
@@ -83,6 +84,32 @@
   transition: color var(--duration-fast) var(--ease-default);
 }
 
+/* Rows arrive one after another as the sheet opens, top to bottom, so the menu reads as
+   unfolding rather than as a block of text appearing. `both` holds the opening frame until
+   each row's turn comes; without it every row would be visible during the stagger and only
+   the movement would be staggered.
+
+   The delay is set inline from the component as --nav-step, because these rows are not
+   siblings of one another — each sits in its own <li>, and the services item carries a
+   sublist between it and the next row, so nth-child could not produce the sequence. */
+.link,
+.subLink {
+  animation: nav-row-in 0.34s var(--ease-entrance) both;
+  animation-delay: calc(var(--nav-step, 0) * 45ms);
+}
+
+@keyframes nav-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .linkIcon {
   flex-shrink: 0;
   color: var(--color-brand-09);
@@ -99,16 +126,32 @@
   transition: transform var(--duration-normal) var(--ease-default);
 }
 
-.link:hover {
+.link:hover,
+.link:focus-visible {
   color: var(--color-brand-09);
 }
 
-.link:hover .linkLabel {
+.link:hover .linkLabel,
+.link:focus-visible .linkLabel {
   transform: scale(1.04);
 }
 
-.link:hover .linkIcon {
+.link:hover .linkIcon,
+.link:focus-visible .linkIcon {
   opacity: 1;
+}
+
+/* These rows span the sheet, so the global press-scale in globals.css would visibly pull
+   their edges away from the sheet's padding. The label carries the press instead — it is
+   already the element that grows on hover, and it is anchored left, well inside the edges. */
+.link:active:active .linkLabel,
+.subLink:active:active {
+  transform: scale(0.98);
+  transition-duration: var(--duration-press);
+}
+
+.subLink:active:active {
+  transform-origin: left center;
 }
 
 /* Current page: brand colour plus a fully lit arrow. Deliberately no edge-bleeding bar or
@@ -139,7 +182,8 @@
   transition: color var(--duration-fast) var(--ease-default);
 }
 
-.subLink:hover {
+.subLink:hover,
+.subLink:focus-visible {
   color: var(--foreground-01);
 }
 
@@ -185,4 +229,21 @@
 
 .emailIcon {
   font-size: 0.7em;
+  transition: transform var(--duration-normal) var(--ease-entrance);
+}
+
+.email:hover .emailIcon,
+.email:focus-visible .emailIcon {
+  transform: translate(2px, -2px);
+}
+
+/* base.css collapses animation-duration under this query but leaves animation-delay alone, so
+   without this the drawer rows would still hold themselves invisible through a 400ms cascade
+   of delays and then pop in one by one — a stagger with the animation taken out of it. */
+@media (prefers-reduced-motion: reduce) {
+  .link,
+  .subLink {
+    animation: none;
+    animation-delay: 0ms;
+  }
 }

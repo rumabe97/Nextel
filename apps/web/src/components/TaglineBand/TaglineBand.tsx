@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import styles from './TaglineBand.module.css';
 
+import { Reveal } from 'components/Reveal';
+
 import type { CSSProperties } from 'react';
 
 // Measured in Roboto Bold uppercase across both languages: 0.588–0.622em per character.
@@ -28,8 +30,13 @@ function estimateFit(primary: string, secondary: string) {
 // The mid-page display band from `02_Home`: Figma stores it as two component sets
 // ("CONECTAMOS HOY" #2045:201, "IMPULSAMOS EL MAÑANA" #2045:202) whose variants move the
 // lines from off-canvas (x:-1206 / x:1595, opacity 0) to rest — i.e. a scroll-triggered
-// slide-in, line 1 from the left, line 2 from the right. An IntersectionObserver arms it
-// once; prefers-reduced-motion collapses the transition globally (ui/styles/base).
+// slide-in, line 1 from the left, line 2 from the right. That is `Reveal`'s `split` variant,
+// and going through it rather than keeping the bespoke observer this used to own buys three
+// things: the band joins the page's single IntersectionObserver, it fires on the same
+// threshold as everything around it instead of its own, and — the reason that matters — it
+// stops shipping `opacity: 0` in the server HTML. Hidden markup is not eligible to be the
+// Largest Contentful Paint and does not come back without JavaScript; this was the last
+// component on the site still doing it.
 export interface TaglineBandProps {
   primary: string;
   secondary: string;
@@ -37,7 +44,6 @@ export interface TaglineBandProps {
 
 export function TaglineBand({ primary, secondary }: TaglineBandProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
 
   // How many em wide the longest line is, indent included. The stylesheet divides the band's
   // own width by this, so the type is sized by the text it has to fit rather than by a fixed
@@ -108,39 +114,18 @@ export function TaglineBand({ primary, secondary }: TaglineBandProps) {
     };
   }, [measure]);
 
-  useEffect(() => {
-    const node = ref.current;
-
-    if (!node) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries.some(entry => entry.isIntersecting)) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.35 }
-    );
-
-    observer.observe(node);
-
-    return () => observer.disconnect();
-  }, []);
-
   return (
     // Decorative restatement of the brand line — the page's h1 already carries it for
     // assistive tech, so this stays out of the a11y tree.
-    <div
-      aria-hidden={true}
-      className={visible ? `${styles.band} ${styles.visible}` : styles.band}
-      ref={ref}
-      style={{ '--band-fit': String(fit) } as CSSProperties}
-    >
-      <p className={`${styles.line} ${styles.filled}`}>{primary}</p>
-      <p className={`${styles.line} ${styles.outlined}`}>{secondary}</p>
+    //
+    // The outer element stays a plain div rather than becoming the Reveal: it is what owns
+    // `container-type` and the measured `--band-fit`, and the ref that reads both lines back.
+    // Reveal wraps only the pair, which is also exactly the scope `split` needs.
+    <div aria-hidden={true} className={styles.band} ref={ref} style={{ '--band-fit': String(fit) } as CSSProperties}>
+      <Reveal className={styles.lines} variant="split">
+        <p className={`${styles.line} ${styles.filled}`}>{primary}</p>
+        <p className={`${styles.line} ${styles.outlined}`}>{secondary}</p>
+      </Reveal>
     </div>
   );
 }

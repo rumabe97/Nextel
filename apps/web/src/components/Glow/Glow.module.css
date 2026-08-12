@@ -14,4 +14,40 @@
     transparent 80%
   );
   pointer-events: none;
+  /* Duration, phase and direction all come from the component — see `drift` there. */
+  animation: glow-drift var(--glow-duration, 26s) ease-in-out var(--glow-delay, 0s) infinite;
+}
+
+/* The glows are the entire atmosphere of a dark page, and left static they make it read as a
+   flat image. This is the smallest amount of movement that fixes that: a drift of two or three
+   percent of the glow's own diameter and a four-percent breath, over the better part of half a
+   minute. It is meant to be invisible as motion.
+
+   Transform only, and that is not a preference. These are radial gradients up to ~1500px
+   across; animating the gradient itself — its stops, its position, its size — would repaint a
+   surface that large on every frame, which is the one thing guaranteed to stutter on an older
+   phone. A transform is handed to the compositor and costs the main thread nothing.
+
+   `translate(-50%, -50%)` is repeated in both keyframes because the animation replaces the
+   base `transform` outright while it runs; dropping it here would fling every glow down and
+   right by half its own size. Opacity is deliberately absent: it is set per glow as an inline
+   style from the Figma fill alpha, and an animation would override all of them. */
+@keyframes glow-drift {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) translate3d(var(--glow-drift-x, 2%), var(--glow-drift-y, -2%), 0) scale(1.04);
+  }
+}
+
+/* ui/styles/base already clamps this to one 0.01ms iteration, which would land it back on the
+   base transform anyway. Saying it outright avoids that one settling frame and makes the
+   intent legible where the rule lives. */
+@media (prefers-reduced-motion: reduce) {
+  .glow {
+    animation: none;
+  }
 }

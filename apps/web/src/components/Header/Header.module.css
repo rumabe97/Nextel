@@ -5,10 +5,13 @@
   align-items: center;
   width: 100%;
   max-width: 1766px;
-  height: var(--header-height);
+  /* --header-shrink is 1 until HeaderShell adds its scrolled class, which sets 0.86. Only
+     this bar condenses — see the note there for why --header-height itself must not move. */
+  height: calc(var(--header-height) * var(--header-shrink, 1));
   margin-inline: auto;
   padding-inline: var(--space-06);
   gap: var(--space-06);
+  transition: height var(--duration-normal) var(--ease-entrance);
   /* Below the nav breakpoint HeaderNav is `display: none`, so it is not a grid item at all
      and only two items are placed. A three-track list would leave a trailing 1fr column
      empty and park the drawer toggle in the middle of the header — it belongs against the
@@ -25,10 +28,18 @@
   }
 }
 
+/* The logo is a link home on every page and was the one control on the site that answered a
+   pointer with nothing at all. Scaling the mark from its left edge keeps it pinned to the
+   header's inset while it grows, so the header's alignment does not appear to shift. */
 .brand {
   display: flex;
   align-items: center;
   justify-self: start;
+}
+
+.brand:hover .logo,
+.brand:focus-visible .logo {
+  transform: scale(1.04);
 }
 
 .actions {
@@ -37,16 +48,21 @@
   justify-self: end;
 }
 
-/* Figma's 69px lockup, scaled back on small screens so it doesn't crowd the drawer toggle. */
+/* Figma's 69px lockup, scaled back on small screens so it doesn't crowd the drawer toggle.
+   The height also eases, because HeaderShell shrinks --header-height once the page scrolls. */
 .logo {
   width: auto;
-  height: 48px;
+  height: calc(48px * var(--header-shrink, 1));
+  transform-origin: left center;
+  transition:
+    height var(--duration-normal) var(--ease-entrance),
+    transform var(--duration-normal) var(--ease-emphasis);
 }
 
 @media (min-width: 64rem) {
   .logo {
     width: auto;
-    height: 69px;
+    height: calc(69px * var(--header-shrink, 1));
   }
 }
 

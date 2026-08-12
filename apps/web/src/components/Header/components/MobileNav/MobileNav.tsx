@@ -13,9 +13,9 @@ import { LanguageSwitcher } from 'components/LanguageSwitcher';
 
 import { isActivePath } from 'lib/navigation';
 
+import type { CSSProperties, MouseEvent } from 'react';
 import type { Dictionary } from 'i18n/dictionaries/es';
 import type { Locale } from 'i18n/config';
-import type { MouseEvent } from 'react';
 import type { NavItem } from 'lib/navigation';
 
 /**
@@ -118,6 +118,22 @@ export function MobileNav({ contactEmail, dictionary, items, locale }: MobileNav
     land(hashIndex === -1 ? '' : href.slice(hashIndex + 1), Date.now() + LANDING_TIMEOUT_MS);
   }
 
+  // Step numbers for the row-by-row entrance, counted across the flattened menu: a services
+  // sub-item sits between its parent row and the next top-level one, so the sequence the eye
+  // follows is not the sequence of any one list's children and nth-child cannot express it.
+  // Built up front rather than by incrementing a counter inside the JSX, so rendering stays a
+  // pure function of `items`.
+  const rowStep = new Map<string, number>();
+  let step = 0;
+
+  for (const item of items) {
+    rowStep.set(item.href, step++);
+
+    for (const child of item.children ?? []) {
+      rowStep.set(child.href, step++);
+    }
+  }
+
   return (
     <Drawer
       onOpenChange={setOpen}
@@ -138,7 +154,10 @@ export function MobileNav({ contactEmail, dictionary, items, locale }: MobileNav
             const isActive = isActivePath(pathname, item.href, locale);
 
             return (
-              <li className={styles.item} key={item.href}>
+              // --nav-step rides on the <li> rather than on the Link: the DS Link documents a
+              // fixed prop surface and does not take `style`, and a custom property set here
+              // inherits down to the row inside it just the same.
+              <li className={styles.item} key={item.href} style={{ '--nav-step': rowStep.get(item.href) } as CSSProperties}>
                 <Link
                   aria-current={isActive ? 'page' : undefined}
                   className={isActive ? `${styles.link} ${styles.active}` : styles.link}
@@ -151,7 +170,7 @@ export function MobileNav({ contactEmail, dictionary, items, locale }: MobileNav
                 {item.children ? (
                   <ul className={styles.subList}>
                     {item.children.map((child, index) => (
-                      <li key={child.href}>
+                      <li key={child.href} style={{ '--nav-step': rowStep.get(child.href) } as CSSProperties}>
                         <Link className={styles.subLink} href={child.href}>
                           {/* Same 01/02 numbering the service cards use on the home page. */}
                           <span className={styles.subIndex}>{String(index + 1).padStart(2, '0')}</span>

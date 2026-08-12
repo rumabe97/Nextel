@@ -1,0 +1,177 @@
+/* Only opacity and transform are ever animated here. Both are composited — the browser can
+   run them without re-running layout or paint — whereas animating height, margin or top forces
+   a reflow on every frame of every reveal on the page, which is what turns scroll animation
+   into jank on an older phone and shows up as INP in the field.
+
+   `.root` on its own is inert. It carries no offset and no opacity, so the server-rendered
+   page is the finished page; the variant classes below only bite once `.hidden` is added, and
+   Reveal.tsx adds that on mount and only to elements that are entirely below the fold. See
+   the long note in that file for why this is not the usual arrangement. */
+
+.hidden.fade,
+.hidden.up,
+.hidden.left,
+.hidden.right,
+.hidden.scale,
+.hidden.split > *,
+.hidden.stagger > * {
+  opacity: 0;
+  /* No transition while the offset is being taken on — the element must arrive in its hidden
+     state instantly. The transition is declared on the revealed state instead, which is the
+     only direction that should ever be watchable. */
+  transition: none;
+}
+
+.hidden.up {
+  transform: translate3d(0, var(--reveal-shift), 0);
+}
+
+.hidden.left {
+  transform: translate3d(calc(var(--reveal-shift) * -1), 0, 0);
+}
+
+.hidden.right {
+  transform: translate3d(var(--reveal-shift), 0, 0);
+}
+
+/* For media. Small on purpose: past ~1.04 it reads as the image being pushed at the reader
+   rather than settling into the page. */
+.hidden.scale {
+  transform: scale(0.97);
+}
+
+.hidden.stagger > * {
+  transform: translate3d(0, var(--reveal-shift), 0);
+}
+
+/* `split` moves the children apart rather than the wrapper as a whole: odd ones come from the
+   left, even ones from the right, and they arrive together with no stagger between them. It
+   exists for pairs that are one gesture — the two lines of the home page's display band, which
+   Figma draws sliding in from opposite edges — where a single direction would read as the pair
+   sliding past rather than closing. */
+.hidden.split > *:nth-child(odd) {
+  transform: translate3d(calc(var(--reveal-shift) * -1), 0, 0);
+}
+
+.hidden.split > *:nth-child(even) {
+  transform: translate3d(var(--reveal-shift), 0, 0);
+}
+
+/* ── Revealed ──────────────────────────────────────────────────────────────
+   `will-change` is deliberately absent. It would promote every reveal to its own compositor
+   layer for the whole session — on a long page that is dozens of layers held permanently,
+   which costs more memory than the animation saves. */
+
+.hidden[data-revealed],
+.hidden[data-revealed] > * {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--duration-reveal) var(--ease-entrance),
+    transform var(--duration-reveal) var(--ease-entrance);
+}
+
+/* `split` needs saying twice, and only because of specificity. Every other variant sets its
+   offset at one class plus one class (`.hidden.up`), which the rule above matches and, coming
+   later in this file, wins. `split` has to name a child index to send odd and even in opposite
+   directions, and `:nth-child()` counts — `.hidden.split > *:nth-child(odd)` is 0-3-0 against
+   the 0-2-0 above. So the offset survived the reveal: the band's opacity animated in (that
+   half IS 0-2-0 and did win) while both lines stayed shifted 8% apart for good, with the
+   band's own `overflow: hidden` clipping a glyph off each end. Matching the index here puts
+   the two at 0-4-0 and 0-3-0, which is the order they have to be in. */
+.hidden.split[data-revealed] > *:nth-child(odd),
+.hidden.split[data-revealed] > *:nth-child(even) {
+  transform: none;
+}
+
+.hidden[data-revealed] {
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+/* ── Stagger ───────────────────────────────────────────────────────────────
+   The wrapper stays put and its direct children arrive in sequence — one observer and one
+   wrapper for a whole card row, instead of a Reveal around every card.
+
+   Explicit steps rather than generated: CSS has no arithmetic over an element's own index,
+   and ten covers every group on the site (the longest is the privacy policy's nine sections).
+   Past ten, children share the last step — a 900ms lead-in is already the ceiling of what
+   reads as one gesture rather than as a queue.
+
+   Every step carries `--reveal-delay` as its base. Without it the `delay` prop was silently
+   dead on any staggered group: it is applied to the wrapper's own transition-delay, and under
+   `stagger` the wrapper does not move — only its children do, and their delays are set here.
+   Contact passes `delay={1}` to sequence its form column after the aside beside it, and that
+   is the rule that has to honour it. */
+.hidden.stagger[data-revealed] > *:nth-child(1) {
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.hidden.stagger[data-revealed] > *:nth-child(2) {
+  transition-delay: calc(var(--reveal-delay, 0ms) + var(--reveal-stagger) * 1);
+}
+
+.hidden.stagger[data-revealed] > *:nth-child(3) {
+  transition-delay: calc(var(--reveal-delay, 0ms) + var(--reveal-stagger) * 2);
+}
+
+.hidden.stagger[data-revealed] > *:nth-child(4) {
+  transition-delay: calc(var(--reveal-delay, 0ms) + var(--reveal-stagger) * 3);
+}
+
+.hidden.stagger[data-revealed] > *:nth-child(5) {
+  transition-delay: calc(var(--reveal-delay, 0ms) + var(--reveal-stagger) * 4);
+}
+
+.hidden.stagger[data-revealed] > *:nth-child(6) {
+  transition-delay: calc(var(--reveal-delay, 0ms) + var(--reveal-stagger) * 5);
+}
+
+.hidden.stagger[data-revealed] > *:nth-child(7) {
+  transition-delay: calc(var(--reveal-delay, 0ms) + var(--reveal-stagger) * 6);
+}
+
+.hidden.stagger[data-revealed] > *:nth-child(8) {
+  transition-delay: calc(var(--reveal-delay, 0ms) + var(--reveal-stagger) * 7);
+}
+
+.hidden.stagger[data-revealed] > *:nth-child(9) {
+  transition-delay: calc(var(--reveal-delay, 0ms) + var(--reveal-stagger) * 8);
+}
+
+.hidden.stagger[data-revealed] > *:nth-child(n + 10) {
+  transition-delay: calc(var(--reveal-delay, 0ms) + var(--reveal-stagger) * 9);
+}
+
+/* A phone scrolls a viewport-height in a flick, so a full 28px offset means the element is
+   still visibly sliding when it should already be readable — and a horizontal offset on a
+   390px screen is a much larger share of the width than the same value is at 1440. */
+@media (max-width: 48rem) {
+  .root {
+    --reveal-shift: 1rem;
+    --reveal-stagger: 70ms;
+  }
+}
+
+/* Last block in the file, so it wins on source order without needing !important.
+   ui/styles/base.css already collapses every duration to 0.01ms under this query, which alone
+   would make the reveals snap rather than animate; this goes further and removes the offsets,
+   so there is never a frame in which content sits displaced. */
+@media (prefers-reduced-motion: reduce) {
+  .hidden.fade,
+  .hidden.up,
+  .hidden.left,
+  .hidden.right,
+  .hidden.scale,
+  .hidden.split > *,
+  .hidden.stagger > * {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Same 0-3-0 problem as above, and worse here: with no transition to watch, a visitor who
+     asked for less motion would simply be handed the clipped band as its resting state. */
+  .hidden.split > *:nth-child(odd),
+  .hidden.split > *:nth-child(even) {
+    transform: none;
+  }
+}

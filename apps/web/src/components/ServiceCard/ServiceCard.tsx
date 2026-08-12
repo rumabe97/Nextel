@@ -4,10 +4,15 @@ import styles from './ServiceCard.module.css';
 
 import { Icon } from 'components/Icon';
 
+import { blurred } from 'lib/blurData';
+
+import type { BlurredImage } from 'lib/blurData';
+
 export interface ServiceCardProps {
   href: string;
-  /** Photograph behind the card. */
-  image: string;
+  /** Photograph behind the card. Typed to the set that has a blur placeholder generated, so
+   *  a new photo cannot ship without one. */
+  image: BlurredImage;
   /** Two-digit index shown ghosted at the top of the panel ("01", "02"). */
   index: string;
   title: string;
@@ -27,7 +32,7 @@ export function ServiceCard({ href, image, index, title }: ServiceCardProps) {
   return (
     <article className={styles.card}>
       <div className={styles.media}>
-        <Image alt="" className={styles.image} height={335} sizes="(max-width: 48rem) 100vw, 44vw" src={image} width={503} />
+        <Image alt="" className={styles.image} height={335} sizes="(max-width: 48rem) 100vw, 44vw" width={503} {...blurred(image)} />
       </div>
 
       <div className={styles.panel}>

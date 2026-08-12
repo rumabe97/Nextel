@@ -61,13 +61,43 @@
 }
 
 .pillarTitle {
+  position: relative;
   padding-bottom: var(--space-03);
-  border-bottom: 1px solid var(--border-01);
   color: var(--foreground-01);
   font-size: var(--font-size-03);
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+/* The rule under each pillar heading draws itself in, the same way the keylines on Why and the
+   value statements on the home page do. Drawn by default and collapsed only once Reveal has
+   confirmed it hid the row — see Why.module.css for why that direction matters.
+   Each pillar is its own step of the stagger, so the index carries the sequencing. */
+.pillarTitle::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: var(--border-01);
+  content: '';
+  transform-origin: left center;
+}
+
+[data-reveal='hidden'] .pillarTitle::after {
+  transform: scaleX(0);
+}
+
+[data-revealed] .pillarTitle::after {
+  transform: scaleX(1);
+  transition: transform 0.65s var(--ease-entrance) calc(var(--reveal-delay, 0ms) + var(--reveal-stagger) * var(--pillar-index, 0) + 160ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal='hidden'] .pillarTitle::after {
+    transform: none;
+  }
 }
 
 .pillarBody {

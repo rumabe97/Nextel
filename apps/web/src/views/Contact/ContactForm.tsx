@@ -112,6 +112,23 @@ export function ContactForm({ copy, locale, privacy }: ContactFormProps) {
         </p>
       ) : null}
 
+      {/* Sending is the only thing anyone comes to this page to do, and until now the form
+          said nothing about having done it: the fields blanked out and a toast appeared
+          somewhere else on screen. A message that arrives where the work happened — and a
+          mark that lands a beat after it — is what makes a submission feel received rather
+          than merely accepted.
+          No `role="status"` on purpose. The toast fired by the effect above is already a live
+          region carrying this same sentence, and two of them means a screen reader hears the
+          confirmation twice. This is the visible half; the toast is the announced half. */}
+      {state.success ? (
+        <p className={styles.formSuccess}>
+          <span aria-hidden={true} className={styles.formSuccessIcon}>
+            <Icon name="checkCircle" />
+          </span>
+          {copy.success}
+        </p>
+      ) : null}
+
       {/* Only the submit is disabled while pending — never the inputs, so a visitor can
           keep fixing a typo while the request is in flight. */}
       <button className={styles.submit} disabled={isPending} type="submit">

@@ -7,7 +7,10 @@
   gap: var(--space-03);
 }
 
+/* transform-origin is centre by default, which on a two-letter label anchored against a
+   divider makes the lift look like it is drifting sideways. */
 .option {
+  display: inline-block;
   color: var(--foreground-02);
   font-family: var(--font-heading), var(--font-fallback);
   font-size: 0.9375rem;
@@ -15,11 +18,15 @@
   letter-spacing: var(--tracking-caption);
   line-height: 1.17;
   text-transform: uppercase;
-  transition: color var(--duration-fast) var(--ease-default);
+  transition:
+    color var(--duration-fast) var(--ease-default),
+    transform var(--duration-normal) var(--ease-emphasis);
 }
 
-.option:hover {
+.option:hover,
+.option:focus-visible {
   color: var(--foreground-01);
+  transform: translateY(-1px);
 }
 
 /* Same emphasis Figma gives the current nav item: Roboto Bold on Primary. */

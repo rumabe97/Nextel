@@ -4,7 +4,7 @@
   color: var(--color-brand-09);
 }
 
-/* Both children occupy the same grid cell; the ghost sets the width, the word paints. */
+/* Every word and the ghost share one grid cell; the ghost sets the width, the words paint. */
 .ghost,
 .word {
   grid-area: 1 / 1;
@@ -14,8 +14,32 @@
   visibility: hidden;
 }
 
+/* The resting state for every word that is not the current one. Opacity only, and no
+   transform: the outgoing word fades out exactly where it stands while the incoming one rises
+   into the same place, so the two overlap as a dissolve rather than trading positions. */
 .word {
+  opacity: 0;
+  transition: opacity var(--duration-slow) var(--ease-default);
+}
+
+/* An animation rather than a transition for the arrival, because it has to replay every time
+   the class lands on a different word — and a transition from a state the element is already
+   in produces nothing. Animations outrank transitions in the cascade, so the lift wins while
+   it runs and the transition above takes back over for the fade out. */
+.current {
+  opacity: 1;
   animation: swap var(--duration-slow) var(--ease-default);
+}
+
+/* In the accessibility tree and in reading order, out of the layout: absolute, so it never
+   becomes a second grid item and cannot widen the line. */
+.announced {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 @keyframes swap {
@@ -26,6 +50,6 @@
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
 }

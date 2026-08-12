@@ -35,9 +35,49 @@
   max-width: 240px;
   min-width: 160px;
   padding: var(--space-01);
-  transform-origin: var(--menu-transform-origin);
+  transform-origin: var(--menu-transform-origin, var(--radix-dropdown-menu-content-transform-origin));
   will-change: transform, opacity;
   z-index: var(--z-dropdown);
+}
+
+/* Radix keeps the menu in the DOM through `data-state="closed"` for exactly as long as a CSS
+   animation on this element is still running, so declaring both halves is what buys a real
+   dismissal instead of the menu blinking out of existence. Without the `closed` rule the
+   `open` one alone would give an entrance and no exit.
+
+   `transform-origin` above resolves to Radix's own measurement of where the trigger is, so
+   the menu grows out of the control that opened it whichever side there was room on. Out is
+   quicker than in and travels less: an entrance is worth watching, a dismissal is not. */
+.content[data-state='open'] {
+  animation: menu-in var(--duration-normal) var(--ease-default);
+}
+
+.content[data-state='closed'] {
+  animation: menu-out var(--duration-fast) var(--ease-default);
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes menu-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.98) translateY(-2px);
+  }
 }
 
 .label {

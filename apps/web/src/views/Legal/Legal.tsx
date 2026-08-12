@@ -5,6 +5,7 @@ import { fill } from 'i18n/getDictionary';
 import { Eyebrow } from 'components/Eyebrow';
 import { Glow } from 'components/Glow';
 import { PageSection } from 'components/PageSection';
+import { Reveal } from 'components/Reveal';
 
 import { getContactEmail } from 'lib/contactEmail';
 
@@ -41,8 +42,12 @@ export function Legal({ copy }: LegalProps) {
           <p className={styles.intro}>{copy.intro}</p>
         </header>
 
+        {/* One per section, each triggering on its own. A wall of legal text is the one place
+            where a stagger would actively get in the way — the reader is scanning for a
+            heading, so each block only has to be settled by the time it is reached, and
+            nothing is delayed behind anything else. */}
         {copy.sections.map(section => (
-          <section className={styles.section} key={section.title}>
+          <Reveal as="section" className={styles.section} key={section.title}>
             <h2 className={styles.sectionTitle}>{section.title}</h2>
 
             {section.body.map(paragraph => (
@@ -62,7 +67,7 @@ export function Legal({ copy }: LegalProps) {
             ) : null}
 
             {'footer' in section && section.footer ? <p className={styles.paragraph}>{fill(section.footer, { email })}</p> : null}
-          </section>
+          </Reveal>
         ))}
       </article>
     </PageSection>

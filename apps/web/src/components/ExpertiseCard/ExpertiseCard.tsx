@@ -7,13 +7,17 @@ import { Link } from 'ui/components/Link';
 import { CheckList } from 'components/CheckList';
 import { Icon } from 'components/Icon';
 
+import { blurred } from 'lib/blurData';
+
+import type { BlurredImage } from 'lib/blurData';
 import type { CheckListItem } from 'components/CheckList';
 
 export interface ExpertiseCardProps {
   /** Anchor id so the header dropdown can deep-link to this card. */
   id: string;
-  /** Photograph washed into the card's right side. */
-  image: string;
+  /** Photograph washed into the card's right side. Typed to the set that has a blur
+   *  placeholder generated, so a new photo cannot ship without one. */
+  image: BlurredImage;
   items: CheckListItem[];
   /** Bold second half of the title, e.g. "NUEVA PLANTA" in "Contratación de NUEVA PLANTA". */
   titleAccent: string;
@@ -31,7 +35,7 @@ export function ExpertiseCard({ id, image, items, titleAccent, titleLead }: Expe
       </h3>
 
       <div className={styles.panel}>
-        <Image alt="" className={styles.image} height={697} sizes="(max-width: 64rem) 100vw, 1286px" src={image} width={1286} />
+        <Image alt="" className={styles.image} height={697} sizes="(max-width: 64rem) 100vw, 1286px" width={1286} {...blurred(image)} />
 
         <div className={styles.content}>
           <CheckList items={items} tone="light" />

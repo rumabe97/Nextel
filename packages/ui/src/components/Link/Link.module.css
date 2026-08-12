@@ -13,8 +13,20 @@
   color: var(--color-brand-11);
   text-decoration: underline;
   text-underline-offset: 0.2em;
+  transition:
+    color var(--duration-fast) var(--ease-default),
+    text-decoration-color var(--duration-fast) var(--ease-default),
+    text-decoration-thickness var(--duration-fast) var(--ease-default),
+    text-underline-offset var(--duration-fast) var(--ease-default);
 }
 
-.inline:hover {
+/* Inline links sit inside running text, so a transform is both unavailable (transforms do not
+   apply to non-replaced inline boxes) and unwanted (it would shift the line around them). The
+   underline carries the whole gesture instead: it thickens and drops away from the baseline,
+   which reads as the link coming forward without moving a single glyph. */
+.inline:hover,
+.inline:focus-visible {
+  color: var(--color-brand-12);
   text-decoration-thickness: 2px;
+  text-underline-offset: 0.26em;
 }

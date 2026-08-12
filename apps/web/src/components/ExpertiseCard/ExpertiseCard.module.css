@@ -19,6 +19,43 @@
   text-transform: uppercase;
 }
 
+/* Landing here from the header's Servicios menu, or from a service card on the home page.
+   Both routes drop the visitor at one of two cards that look alike, on a page where the only
+   thing that changed was the scroll position — there was nothing to say which of them had
+   been asked for. Two soft pulses off the tab answer that and then get out of the way.
+
+   The delay lets the smooth scroll finish first; a highlight that fires while the page is
+   still travelling is spent before the visitor has arrived to see it. `:target` also means
+   this needs no JavaScript and covers all three ways in — a fresh load on the URL, a
+   client-side route change, and a same-page jump between the two cards. */
+.card:target .tab {
+  animation: tab-landed 1.9s var(--ease-exit) 0.35s both;
+}
+
+@keyframes tab-landed {
+  0%,
+  44% {
+    box-shadow: 0 0 0 0 rgba(39, 147, 193, 0.7);
+  }
+
+  22%,
+  66% {
+    box-shadow: 0 0 0 12px rgba(39, 147, 193, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(39, 147, 193, 0);
+  }
+}
+
+/* A flashing ring is close to the top of the list of things this preference is asking us not
+   to do, and the base reset only shortens it rather than removing it. */
+@media (prefers-reduced-motion: reduce) {
+  .card:target .tab {
+    animation: none;
+  }
+}
+
 .tabLead {
   font-weight: var(--font-weight-regular);
 }
@@ -29,7 +66,10 @@
 
 .panel {
   position: relative;
+  /* `clip` rather than `hidden` so this crop does not become a scroll container and capture
+     the wash's view timeline — see the note on `.hero` in Home.module.css. */
   overflow: hidden;
+  overflow: clip;
   width: 100%;
   margin-top: calc(var(--space-06) * -1);
   border-radius: var(--radius-03);
@@ -50,6 +90,34 @@
   opacity: 0.85;
 }
 
+/* The wash drifts inside the panel as the card passes. It is masked to a soft edge and sits
+   behind a solid petrol fill, so this reads as the photograph having depth rather than as
+   anything moving — which is the right amount for a surface whose job is to stay behind a
+   checklist. See HeroVideo.module.css for the technique and the overscan. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .image {
+      /* `inset: 0` pins top and bottom; the bottom has to be released for height to apply. */
+      top: -9%;
+      bottom: auto;
+      height: 118%;
+      animation: wash-parallax linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+  }
+}
+
+@keyframes wash-parallax {
+  from {
+    transform: translate3d(0, 7%, 0);
+  }
+
+  to {
+    transform: translate3d(0, -7%, 0);
+  }
+}
+
 .content {
   display: flex;
   flex-direction: column;
@@ -64,6 +132,9 @@
   }
 }
 
+/* The site's pill lift again, in the inverse colourway. The shadow is black rather than brand
+   blue: this pill is white on petrol, so a blue glow would vanish into the panel — what reads
+   as height here is the panel darkening underneath it. */
 .cta {
   display: inline-flex;
   align-items: center;
@@ -71,16 +142,29 @@
   padding: var(--space-03) var(--space-06);
   border-radius: var(--radius-full);
   background: var(--color-white);
+  box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
   color: var(--color-petrol);
   font-size: var(--font-size-03);
   font-weight: var(--font-weight-medium);
-  transition: background var(--duration-fast) var(--ease-default);
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    box-shadow var(--duration-normal) var(--ease-entrance),
+    transform var(--duration-normal) var(--ease-emphasis);
 }
 
-.cta:hover {
+.cta:hover,
+.cta:focus-visible {
   background: var(--color-brand-12);
+  box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.7);
+  transform: translateY(-2px);
 }
 
 .ctaIcon {
   font-size: 0.875rem;
+  transition: transform var(--duration-normal) var(--ease-entrance);
+}
+
+.cta:hover .ctaIcon,
+.cta:focus-visible .ctaIcon {
+  transform: translateX(3px);
 }

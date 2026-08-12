@@ -97,17 +97,26 @@
    Doubled class on purpose: `.mark` in the Logo stylesheet sets `display: block` at the same
    specificity, and which file wins on source order is not something to leave to chance. */
 .introMark.introMark {
+  display: block;
+}
+
+/* The Reveal wrapper is the grid item now, so it is what has to disappear below the
+   breakpoint — hiding only the mark inside it would leave an empty column holding the gap. */
+.introMarkReveal {
   display: none;
 }
 
 @media (min-width: 64rem) {
-  .introMark.introMark {
+  .introMarkReveal {
     display: block;
+    justify-self: center;
+  }
+
+  .introMark.introMark {
     /* Scales with its column rather than sitting at a fixed 280px, so it stays proportionate
        from the breakpoint up to the widest desktop. */
     height: clamp(12rem, 17vw, 19rem);
     color: rgba(255, 255, 255, 0.1);
-    justify-self: center;
   }
 }
 
@@ -127,9 +136,13 @@
   }
 }
 
-/* The design masks these photos into circles. */
+/* The design masks these photos into circles.
+   `clip` rather than `hidden` so the disc does not become a scroll container and capture the
+   photograph's view timeline — see the note on `.hero` in Home.module.css. `clip` honours
+   `border-radius` exactly as `hidden` does. */
 .missionMedia {
   overflow: hidden;
+  overflow: clip;
   width: min(100%, 24rem);
   margin-inline: auto;
   border-radius: var(--radius-full);
@@ -174,13 +187,45 @@
 }
 
 .missionCardTitle {
+  position: relative;
   padding-bottom: var(--space-03);
-  border-bottom: 1px solid var(--border-01);
   color: var(--foreground-01);
   font-size: var(--font-size-03);
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+/* The rule draws itself in, matching the pillars on Services and the keylines on Why. See
+   Why.module.css for why it is drawn by default and collapsed only on confirmation.
+
+   One shared delay rather than a per-card index: the two cards sit inside `.missionGrid`,
+   which is a single child of the staggered column above and therefore arrives as one block —
+   there is no per-card beat here to line up with. The offset puts both rules just after it. */
+.missionCardTitle::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: var(--border-01);
+  content: '';
+  transform-origin: left center;
+}
+
+[data-reveal='hidden'] .missionCardTitle::after {
+  transform: scaleX(0);
+}
+
+[data-revealed] .missionCardTitle::after {
+  transform: scaleX(1);
+  transition: transform 0.65s var(--ease-entrance) calc(var(--reveal-delay, 0ms) + var(--reveal-stagger) * 2 + 200ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal='hidden'] .missionCardTitle::after {
+    transform: none;
+  }
 }
 
 .missionCardBody {
@@ -271,6 +316,7 @@
 
 .challengesMedia {
   overflow: hidden;
+  overflow: clip;
   width: min(100%, 26rem);
   margin-inline: auto;
   border-radius: var(--radius-full);
@@ -281,4 +327,39 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* ── Parallax ──────────────────────────────────────────────────────────────
+   Both portraits are already circular crops of a landscape photograph, so there is nothing to
+   lose by cropping a little more vertically and letting the image travel inside its disc as
+   the page moves. See HeroVideo.module.css for why this is done with `animation-timeline`
+   rather than a scroll handler, and for what the overscan is for.
+
+   `cover` here rather than the hero's `exit`: these sit in the middle of the page, so the
+   interesting span is the whole time they are on screen — arriving from the bottom, leaving
+   at the top. At both ends of that range the 18% of extra height still covers the disc, so
+   the crop never pulls away from an edge.
+
+   The two Reveal wrappers around these carry a `scale` of their own for a few hundred
+   milliseconds on first sight; it settles to `none` and does not interact with this. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .challengesImage,
+    .missionImage {
+      height: 118%;
+      animation: portrait-parallax linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+  }
+}
+
+@keyframes portrait-parallax {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, -15.25%, 0);
+  }
 }

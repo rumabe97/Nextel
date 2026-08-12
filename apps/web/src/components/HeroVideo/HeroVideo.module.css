@@ -4,6 +4,14 @@
   inset: 0;
 }
 
+/* Holds the footage and does the moving. Without scroll-driven animations it is simply the
+   same box as .media and has no effect at all; the parallax block at the bottom is what
+   gives it a size of its own. */
+.frame {
+  position: absolute;
+  inset: 0;
+}
+
 .poster,
 .video {
   position: absolute;
@@ -32,4 +40,89 @@
 
 .posterHidden {
   opacity: 0;
+}
+
+/* ── Parallax ──────────────────────────────────────────────────────────────
+   The footage lags the page as the hero scrolls away, which is the one place on this site
+   where depth is worth spending anything on: it is the first screen anyone sees.
+
+   `animation-timeline: view()` drives this from scroll position with no JavaScript at all —
+   no listener, no rAF loop, no measurement. That matters for more than tidiness: a scroll
+   handler that writes a transform runs on the main thread and lands its change one frame
+   late, which is exactly the smeared, rubber-banding parallax that gives the technique a bad
+   name. A scroll-driven animation is handed to the compositor and stays in step with the
+   scroll no matter what else the page is doing.
+
+   Wrapped in `@supports` and nothing else. Where the feature is missing — Safari before 26 —
+   the rules simply never apply and the hero is exactly what it is today. There is no fallback
+   path to maintain, which is the whole argument for doing it this way rather than with a
+   library.
+
+   `exit` and not `cover`: the hero starts at the very top of the document, so `cover` — which
+   begins when the subject first touches the bottom of the scrollport — is already part-way
+   through at scroll zero and would apply a transform before anyone has scrolled at all.
+   `exit` begins precisely when the top edge starts to leave and ends when the last of the
+   hero has gone.
+
+   The overscan is what keeps this honest. The frame is made taller than the hero and sits
+   proportionally above it, so there is slack to travel into; the hero's own `overflow: clip`
+   crops the rest. Without it, translating the footage down would drag its top edge into view
+   and open a strip of bare page across the top of the video.
+
+   Which is why the timeline is NAMED and hangs off .media rather than being an anonymous
+   `view()` on the frame itself. An anonymous timeline takes the animated element as its own
+   subject, and that element is the overscanned one: it already pokes 6% above the scrollport
+   at scroll zero, so `exit` reads as 12% elapsed before the visitor has touched anything, and
+   the frame sits permanently a few pixels lower than it was laid out. .media is the hero box
+   exactly — the same box the clip is taken from — so anchoring to it makes scroll zero mean
+   progress zero. `view-timeline-inset: 0` finishes the job: the default inset is the scroll
+   container's `scroll-padding-top`, which this document sets to clear the fixed header, and
+   that would otherwise start the range ~119px above the page.
+
+   All of that matters because of what a stray few pixels cost here. The frame is composited,
+   so it takes its clip from the hero snapped to whole device pixels, while the darkening
+   overlay beside it is painted at fractional precision. Whenever the hero's bottom edge lands
+   on a fractional pixel — which is exactly what the page transition's translate does to it —
+   the snapped clip keeps one row the overlay does not cover. Any footage in that row shows
+   through undimmed, as a bright hairline across the foot of the hero. So the slack is ALL
+   above: 6% up plus 106% tall puts the frame's bottom edge exactly on the hero's, and at rest
+   there is nothing in that row to reveal. Scrolling does push the frame below the hero again,
+   but scrolling brings no fractional transform with it, and an arrival always lands at the
+   top of the page. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .media {
+      view-timeline-name: --nextel-hero;
+      view-timeline-inset: 0;
+    }
+
+    .frame {
+      /* `inset: 0` above pins top AND bottom, which over-constrains height and would make it
+         ignored outright. Releasing the bottom is what lets the height apply. */
+      top: -6%;
+      bottom: auto;
+      /* The -1px is a rounding guard, not a design value. -6% + 106% is exactly 100% on
+         paper, but on a hero whose height is itself fractional (70svh of an 844px phone is
+         590.796875) the two percentages resolve a few millionths of a pixel apart, and a clip
+         rounds that residue up into a whole row. Landing a pixel short instead costs nothing
+         visible — the overlay's last stop is solid page colour and paints over the gap. */
+      height: calc(106% - 1px);
+      animation: hero-parallax linear both;
+      animation-range: exit;
+      animation-timeline: --nextel-hero;
+    }
+  }
+}
+
+/* 5% of the frame's own height, which is 5.3% of the hero's — comfortably inside the 6% of
+   slack above it, so the top edge never arrives. That margin is the only constraint on this
+   number; the two have to be read together. */
+@keyframes hero-parallax {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 5%, 0);
+  }
 }

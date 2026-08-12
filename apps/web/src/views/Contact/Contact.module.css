@@ -1,6 +1,9 @@
 .section {
   position: relative;
+  /* `clip` rather than `hidden` so this crop does not become a scroll container and capture
+     the skyline's view timeline — see the note on `.hero` in Home.module.css. */
   overflow: hidden;
+  overflow: clip;
   /* Full-bleed skyline: cancel main's header offset so it runs up behind the fixed header. */
   margin-top: calc(var(--header-height) * -1);
   padding-block: var(--section-gap);
@@ -16,6 +19,33 @@
   height: 100%;
   object-fit: cover;
   object-position: center bottom;
+}
+
+/* The skyline lags the page on the way down. This section IS the page here, so `exit` runs
+   from scroll zero to the bottom of the document and the drift plays out across the whole
+   visit. See HeroVideo.module.css for the technique and for what the overscan is doing. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .background {
+      /* `inset: 0` pins top and bottom; the bottom has to be released for height to apply. */
+      top: -6%;
+      bottom: auto;
+      height: 112%;
+      animation: skyline-parallax linear both;
+      animation-timeline: view();
+      animation-range: exit;
+    }
+  }
+}
+
+@keyframes skyline-parallax {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 5%, 0);
+  }
 }
 
 /* The skyline is atmosphere, not content: it has to sit far enough back that white form
@@ -106,10 +136,43 @@
 }
 
 .title {
+  position: relative;
   padding-bottom: var(--space-05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
   color: var(--color-brand-09);
   font-size: clamp(2.5rem, 6vw, 4.5rem);
   line-height: var(--line-height-01);
   text-transform: uppercase;
+}
+
+/* The heaviest rule on the site — it runs the full width of the form column under a 72px
+   heading — so it is the one most worth drawing rather than simply having. Same treatment as
+   the keylines on Why and the pillars on Services; see Why.module.css for why it is drawn by
+   default and only collapsed on confirmation.
+
+   This heading is the first child of its staggered column, so it needs no index of its own;
+   `--reveal-delay` carries the column's offset from the aside beside it. */
+.title::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.35);
+  content: '';
+  transform-origin: left center;
+}
+
+[data-reveal='hidden'] .title::after {
+  transform: scaleX(0);
+}
+
+[data-revealed] .title::after {
+  transform: scaleX(1);
+  transition: transform 0.75s var(--ease-entrance) calc(var(--reveal-delay, 0ms) + 200ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal='hidden'] .title::after {
+    transform: none;
+  }
 }

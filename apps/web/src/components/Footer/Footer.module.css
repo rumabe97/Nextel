@@ -69,15 +69,27 @@
   border-radius: var(--radius-full);
   color: var(--color-white);
   font-size: var(--font-size-02);
-  transition: background var(--duration-fast) var(--ease-default);
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    border-color var(--duration-fast) var(--ease-default),
+    transform var(--duration-normal) var(--ease-emphasis);
 }
 
-.email:hover {
+.email:hover,
+.email:focus-visible {
+  border-color: var(--color-white);
   background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-2px);
 }
 
 .emailIcon {
   font-size: 0.875rem;
+  transition: transform var(--duration-normal) var(--ease-entrance);
+}
+
+.email:hover .emailIcon,
+.email:focus-visible .emailIcon {
+  transform: translate(2px, -2px);
 }
 
 .column {
@@ -101,16 +113,48 @@
   list-style: none;
 }
 
+/* inline-block so the transform below applies at all: a transform on a non-replaced inline
+   box is ignored outright, which is why these links alone need the display change.
+   width:fit-content keeps the hit area and the underline on the words rather than across the
+   whole column — these sit in a 1fr grid track much wider than the labels. */
 .columnLink {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
   color: rgba(255, 255, 255, 0.85);
   font-size: var(--font-size-01);
   letter-spacing: var(--tracking-caption);
   text-transform: uppercase;
-  transition: color var(--duration-fast) var(--ease-default);
+  transition:
+    color var(--duration-fast) var(--ease-default),
+    transform var(--duration-normal) var(--ease-entrance);
 }
 
-.columnLink:hover {
+/* The same rule that wipes under the header nav items, so both link sets in the chrome behave
+   identically. Offset by the tracking so it stops under the last letter rather than under the
+   trailing letter-space. */
+.columnLink::after {
+  position: absolute;
+  right: var(--tracking-caption);
+  bottom: -3px;
+  left: 0;
+  height: 1px;
+  background: currentcolor;
+  content: '';
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--duration-normal) var(--ease-entrance);
+}
+
+.columnLink:hover,
+.columnLink:focus-visible {
   color: var(--color-white);
+  transform: translateX(2px);
+}
+
+.columnLink:hover::after,
+.columnLink:focus-visible::after {
+  transform: scaleX(1);
 }
 
 /* Low-contrast N anchoring the right edge. Decorative only — the Logo renders it via
@@ -130,6 +174,30 @@
     height: clamp(5.5rem, 8vw, 8rem);
     color: rgba(255, 255, 255, 0.16);
     justify-self: end;
+  }
+}
+
+/* The one piece of pure ornament in the footer, so the one that can move freely — there is no
+   crop to protect and nothing reads from its position. A 1rem drift as the footer comes up is
+   enough to separate it from the columns beside it. It only exists at four columns, hence the
+   width condition riding along. See HeroVideo.module.css for the technique. */
+@supports (animation-timeline: view()) {
+  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+    .watermark.watermark {
+      animation: watermark-parallax linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+  }
+}
+
+@keyframes watermark-parallax {
+  from {
+    transform: translate3d(0, 1rem, 0);
+  }
+
+  to {
+    transform: translate3d(0, -1rem, 0);
   }
 }
 

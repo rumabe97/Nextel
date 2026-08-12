@@ -1,3 +1,62 @@
+/* The 404 was the one page with no light and no ornament on it — a heading, a sentence and a
+   link on flat black, which reads less like a designed page than like the site having fallen
+   over. It now borrows the two devices the rest of the site is built from: a glow, and an
+   oversized ghosted numeral of the kind the service cards and the Why pillars already use.
+   Nothing here is content — the numeral is aria-hidden ornament and the glow is a div. */
+.glow {
+  top: 38%;
+  left: 82%;
+}
+
+.mark {
+  display: block;
+  margin-bottom: var(--space-05);
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.22);
+  color: transparent;
+  font-family: var(--font-heading), var(--font-fallback);
+  font-size: clamp(5rem, 20vw, 13rem);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-01);
+}
+
+/* An entrance rather than a scroll reveal: all of this is above the fold on every screen, so
+   there is no scroll for `Reveal` to key off — it would correctly decide there was nothing to
+   animate. The usual reason not to animate the top of a page is that it delays the largest
+   paint; on the page nobody is meant to reach, that trade does not apply.
+   Three steps down the page, each a beat behind the last. */
+.mark,
+.heading,
+.back {
+  animation: not-found-in 0.65s var(--ease-entrance) both;
+}
+
+.heading {
+  animation-delay: 90ms;
+}
+
 .back {
   margin-top: var(--space-07);
+  animation-delay: 180ms;
+}
+
+@keyframes not-found-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--reveal-shift), 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The base reset collapses the duration but leaves the delays, which would hold the page
+   blank for a fifth of a second and then snap it in — worse than not animating. */
+@media (prefers-reduced-motion: reduce) {
+  .mark,
+  .heading,
+  .back {
+    animation: none;
+  }
 }

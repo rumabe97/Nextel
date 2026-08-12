@@ -1,8 +1,28 @@
 /* Card proportions come straight from Figma's group "01" (#417:5678): 503.49 x 401.39. */
+/* :focus-within, not just :hover, throughout this file. The whole card is one stretched link,
+   so a keyboard visitor lands on an anchor that covers it and would otherwise get the focus
+   ring and none of the card's own response. */
 .card {
   position: relative;
   aspect-ratio: 503.49 / 401.39;
   isolation: isolate;
+  transition: transform var(--duration-normal) var(--ease-emphasis);
+}
+
+.card:hover,
+.card:focus-within {
+  transform: translateY(-4px);
+}
+
+/* The press has to be driven from the card, because the thing actually being pressed is the
+   transparent stretched anchor below — scaling that is invisible, so on a phone, where there
+   is no hover, tapping a card would answer with nothing at all.
+   `:has()` is the only way to style an ancestor from its descendant's state. Where it is not
+   supported the card simply keeps the hover-and-navigate behaviour it has now, so this is a
+   pure addition rather than something the layout depends on. */
+.card:has(.link:active) {
+  transform: scale(0.985);
+  transition-duration: var(--duration-press);
 }
 
 /* The photo does NOT start at the card's top. Figma's mask group (#2040:629) sits at
@@ -25,8 +45,9 @@
   transition: transform var(--duration-slow) var(--ease-default);
 }
 
-.card:hover .image {
-  transform: scale(1.04);
+.card:hover .image,
+.card:focus-within .image {
+  transform: scale(1.06);
 }
 
 /* The petrol panel over the photo's top-right: x157 y0, 326.32 x 178.17 of the card, so
@@ -39,6 +60,20 @@
   width: 64.81%;
   height: 44.39%;
   background: var(--color-petrol);
+  transition: background var(--duration-normal) var(--ease-default);
+}
+
+/* The panel used to be the one part of this card that did nothing. Everything around it
+   answered a pointer — the card lifted, the photograph scaled, the disc grew and threw its
+   colour — while the largest single shape in the composition, and the one holding the title,
+   sat perfectly still. A card that lifts as a unit with a frozen face reads as a picture of a
+   card rather than as one.
+   A few percent of brand blue mixed into the petrol is enough: the panel warms toward the
+   accent the disc below it is already wearing. Where `color-mix` is unsupported the whole
+   declaration is dropped and the panel simply stays petrol, which is today's behaviour. */
+.card:hover .panel,
+.card:focus-within .panel {
+  background: color-mix(in srgb, var(--color-petrol) 86%, var(--color-brand-09));
 }
 
 /* Ghosted number, top-right of the panel: outline only, Roboto Medium 50 (#417:5690).
@@ -53,6 +88,18 @@
   font-size: clamp(2rem, 4vw, 3.125rem);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-01);
+  transition:
+    -webkit-text-stroke-color var(--duration-normal) var(--ease-default),
+    transform var(--duration-normal) var(--ease-emphasis);
+}
+
+/* The numeral lifts a little and its outline brightens — it is the card's index, so it should
+   acknowledge the card being picked out. Only the stroke colour changes, never the weight:
+   thickening a 1px outline at this size makes the digits look like they gained a font. */
+.card:hover .index,
+.card:focus-within .index {
+  -webkit-text-stroke-color: var(--color-brand-12);
+  transform: translateY(-2px);
 }
 
 /* Title centred under the number: Roboto Medium 18 (style_4047af88), spanning x36.04 to
@@ -81,9 +128,13 @@
   height: 42px;
   border-radius: var(--radius-full);
   background: var(--color-brand-09);
+  box-shadow: 0 0 0 0 rgba(39, 147, 193, 0);
   color: var(--color-white);
   place-items: center;
-  transition: background var(--duration-fast) var(--ease-default);
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    box-shadow var(--duration-normal) var(--ease-entrance),
+    transform var(--duration-normal) var(--ease-emphasis);
 }
 
 /* The glyph fills 15/24 of the icon box, so 1.3rem puts its drawn width at Figma's 13.01px.
@@ -91,10 +142,22 @@
 .arrowIcon {
   font-size: 1.3rem;
   transform: rotate(-45deg);
+  transition: transform var(--duration-normal) var(--ease-entrance);
 }
 
-.card:hover .arrow {
+/* The disc is the card's call to action, so it does the most: fills brighter, grows, throws
+   its own colour onto the photo behind it, and sends the arrow off along the diagonal it
+   already points down. */
+.card:hover .arrow,
+.card:focus-within .arrow {
   background: var(--color-brand-10);
+  box-shadow: 0 8px 22px -6px rgba(39, 147, 193, 0.75);
+  transform: scale(1.08);
+}
+
+.card:hover .arrowIcon,
+.card:focus-within .arrowIcon {
+  transform: rotate(-45deg) translateX(2px);
 }
 
 /* Stretched link: covers the card without wrapping it, so the <h3> stays outside the

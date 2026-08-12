@@ -52,22 +52,52 @@
    five static cuts, not a variable font — so the scale carries the motion and keeps the
    gesture smooth rather than snapping. */
 .link:hover,
+.link:focus-visible,
 .active {
   color: var(--color-brand-09);
   font-weight: var(--font-weight-bold);
 }
 
-.link:hover {
+.link:hover,
+.link:focus-visible {
   transform: scale(1.05);
+}
+
+.link:hover .label::before,
+.link:focus-visible .label::before {
+  transform: scaleX(1);
 }
 
 /* Reserving the bold width up front: a zero-height copy of the label that is always bold
    makes the item as wide as its heaviest state, so the 300→700 swap cannot nudge the
    items beside it. Without this the whole row jitters on every hover. */
 .label {
+  position: relative;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* A rule that wipes in from the left under the label. The colour-and-weight swap above is
+   Figma's own hover treatment but it lands in a single frame — there is nothing to watch. The
+   underline gives the gesture a direction and a duration without changing what the design
+   says the state looks like.
+   Only on hover and focus, never on `.active`: Figma marks the current page with bold Primary
+   type and nothing else, and a permanent underline there would be inventing a second marker.
+   scaleX from a left origin rather than an animated width — a transform composites, a width
+   relayouts the flex row on every frame. */
+.label::before {
+  position: absolute;
+  right: 0;
+  bottom: -0.4em;
+  left: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-brand-09);
+  content: '';
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--duration-normal) var(--ease-entrance);
 }
 
 .label::after {
@@ -78,10 +108,12 @@
   visibility: hidden;
 }
 
-/* The 13×7 filled triangle beside "Servicios". */
+/* The 13×7 filled triangle beside "Servicios". It turns over while the menu is open, so the
+   trigger says which way the menu is going rather than only that it has one. */
 .caret {
   width: 13px;
   height: 7px;
+  transition: transform var(--duration-normal) var(--ease-entrance);
 }
 
 /* Neutralises the DS trigger pill (32px height, 12px inline padding, full radius, hover
@@ -113,10 +145,21 @@
    box, so hovering its edge would otherwise NOT recolour the label — making "Servicios"
    feel different from the plain links beside it. The open menu keeps it lit too. */
 .trigger:hover .link,
+.trigger:focus-visible .link,
 .trigger[data-state='open'] .link {
   color: var(--color-brand-09);
   font-weight: var(--font-weight-bold);
   transform: scale(1.05);
+}
+
+.trigger:hover .label::before,
+.trigger:focus-visible .label::before,
+.trigger[data-state='open'] .label::before {
+  transform: scaleX(1);
+}
+
+.trigger[data-state='open'] .caret {
+  transform: rotate(180deg);
 }
 
 /* Menu options, from Figma "Servicios 2" (#2026:1069): white 14px labels on rows that gain
@@ -129,10 +172,18 @@
   color: var(--foreground-01);
   font-size: var(--font-size-03);
   font-weight: var(--font-weight-light);
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    color var(--duration-fast) var(--ease-default),
+    transform var(--duration-fast) var(--ease-entrance);
 }
 
+/* translateX rather than extra padding-left: the row would otherwise relayout its own text on
+   every hover, and inside a menu that reflows as the pointer travels down it. 3px is enough
+   to read as the row stepping forward under the cursor. */
 .menuOption.menuOption[data-highlighted],
 .menuOption.menuOption:hover:not(:disabled) {
   background: var(--color-selected) !important;
   color: var(--color-brand-09);
+  transform: translateX(3px);
 }

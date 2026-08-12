@@ -14,6 +14,7 @@ import { Toaster } from 'ui/components/Toaster';
 
 import { Footer } from 'components/Footer';
 import { Header } from 'components/Header';
+import { RouteExit } from 'components/PageTransition';
 
 import { BASE_URL } from 'lib/siteUrl';
 import { body, heading } from 'lib/fonts';
@@ -72,9 +73,14 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     // the element it sits on, never its subtree.
     <html data-scroll-behavior="smooth" lang={locale} suppressHydrationWarning={true}>
       <body className={`${body.variable} ${heading.variable}`} suppressHydrationWarning={true}>
+        {/* No <noscript> escape hatch for the scroll reveals, and none needed: they hide
+            nothing in this HTML. The offset is applied on the client and only to elements
+            already below the fold, so a visitor with scripting off is served the finished
+            page. See components/Reveal for the reasoning. */}
         <a className="skipLink" href="#contenido">
           {dictionary.common.skipToContent}
         </a>
+        <RouteExit />
         <Header dictionary={dictionary} locale={locale as Locale} />
         <main id="contenido">{children}</main>
         <Footer dictionary={dictionary} locale={locale as Locale} />

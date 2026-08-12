@@ -6,6 +6,7 @@ import Image from 'next/image';
 import styles from './HeroTagline.module.css';
 
 import { Glow } from 'components/Glow';
+import { hasNavigated } from 'components/PageTransition/navigationState';
 
 import type { CSSProperties } from 'react';
 
@@ -60,6 +61,13 @@ function estimateFit({ first, fourth, second, third }: HeroTaglineFragments) {
 export function HeroTagline({ tagline }: HeroTaglineProps) {
   const ref = useRef<HTMLHeadingElement>(null);
   const [fit, setFit] = useState(() => estimateFit(tagline));
+
+  // The rows only stagger themselves in on a cold load. Arriving here from another page, the
+  // whole document already has an entrance of its own from `template.tsx`, and playing both
+  // means a 0.42s fade of the page running underneath a 0.9s fade of the headline inside it —
+  // the two do not compose, they smear. On a route change the page transition carries the
+  // hero; on a first visit, where there is no page transition by design, this does.
+  const [animateRows] = useState(() => !hasNavigated());
 
   const measure = useCallback(() => {
     const node = ref.current;
@@ -131,7 +139,7 @@ export function HeroTagline({ tagline }: HeroTaglineProps) {
         <Image alt="" className={styles.icon} height={516} priority={true} src="/images/icon-n.webp" unoptimized={true} width={330} />
       </div>
 
-      <h1 className={styles.tagline} ref={ref}>
+      <h1 className={animateRows ? `${styles.tagline} ${styles.animated}` : styles.tagline} ref={ref}>
         <span className={styles.rowStart}>
           <span className={styles.black}>{tagline.first}</span>
         </span>

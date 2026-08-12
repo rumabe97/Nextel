@@ -32,6 +32,14 @@
   gap: var(--space-02);
   color: var(--foreground-02);
   font-size: var(--font-size-03);
+  transition: color var(--duration-fast) var(--ease-default);
+}
+
+/* The label lifts to full white while its field is being typed in. On a form this long, over
+   a photograph, it is what tells the visitor at a glance which row they are on — the
+   underline alone is a 1px signal at the bottom of the field. */
+.field:focus-within .label {
+  color: var(--foreground-01);
 }
 
 .icon {
@@ -39,6 +47,11 @@
   place-items: center;
   color: var(--color-brand-09);
   font-size: 1rem;
+  transition: transform var(--duration-normal) var(--ease-emphasis);
+}
+
+.field:focus-within .icon {
+  transform: scale(1.15);
 }
 
 .required {
@@ -91,12 +104,83 @@
   font-size: var(--font-size-02);
 }
 
+/* Errors appear after a submit, well below where the eye is — they arrive with a movement so
+   they are not simply present on the next paint with nothing to draw attention to them. */
+.error,
+.formError {
+  animation: field-error-in var(--duration-normal) var(--ease-entrance);
+}
+
 .formError {
   padding: var(--space-04);
   border: 1px solid var(--color-error);
   border-radius: var(--radius-02);
   color: var(--color-error-text);
   font-size: var(--font-size-03);
+}
+
+@keyframes field-error-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The confirmation panel. Brand-tinted rather than the usual green: this is the one moment the
+   site gets to say "received", and it should sound like Nextel rather than like a generic
+   success toast. */
+.formSuccess {
+  display: flex;
+  align-items: center;
+  gap: var(--space-04);
+  padding: var(--space-05);
+  border: 1px solid rgba(39, 147, 193, 0.55);
+  border-radius: var(--radius-02);
+  background: rgba(39, 147, 193, 0.12);
+  color: var(--foreground-01);
+  font-size: var(--font-size-03);
+  animation: form-success-in 0.5s var(--ease-entrance) both;
+}
+
+/* The mark lands a beat after the panel it sits in, and on the overshoot curve rather than the
+   entrance one. That order is the whole effect: the panel arriving and the tick arriving are
+   two events, and reversing or merging them turns a confirmation back into a box appearing. */
+.formSuccessIcon {
+  display: grid;
+  flex-shrink: 0;
+  color: var(--color-brand-10);
+  font-size: 1.5rem;
+  place-items: center;
+  animation: form-success-mark 0.55s var(--ease-emphasis) 0.12s both;
+}
+
+@keyframes form-success-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes form-success-mark {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .submit {
@@ -110,16 +194,24 @@
   border-radius: var(--radius-full);
   background: var(--color-brand-09);
   color: var(--color-white);
+  box-shadow: 0 0 0 0 rgba(39, 147, 193, 0);
   cursor: pointer;
   font-size: var(--font-size-05);
   font-weight: var(--font-weight-medium);
   transition:
     background var(--duration-fast) var(--ease-default),
-    opacity var(--duration-fast) var(--ease-default);
+    box-shadow var(--duration-normal) var(--ease-entrance),
+    opacity var(--duration-fast) var(--ease-default),
+    transform var(--duration-normal) var(--ease-emphasis);
 }
 
-.submit:hover:not(:disabled) {
+/* Same lift-and-glow as the primary pill on the Why page — this is the most consequential
+   button on the site and it should behave like the one the visitor already met. */
+.submit:hover:not(:disabled),
+.submit:focus-visible:not(:disabled) {
   background: var(--color-brand-10);
+  box-shadow: 0 10px 26px -10px rgba(39, 147, 193, 0.85);
+  transform: translateY(-2px);
 }
 
 .submit:disabled {
@@ -127,9 +219,45 @@
   opacity: 0.65;
 }
 
+/* The glyph is already rotated 45° to point up-and-right, so "forward" for it is that
+   diagonal — nudging it straight along x would slide it off its own axis. While the form is
+   submitting it keeps travelling on a loop, which is the only running indicator the button
+   has: the label does not change and there is no spinner. */
 .submitIcon {
   font-size: 1rem;
   transform: rotate(45deg);
+  transition: transform var(--duration-normal) var(--ease-entrance);
+}
+
+.submit:hover:not(:disabled) .submitIcon,
+.submit:focus-visible:not(:disabled) .submitIcon {
+  transform: rotate(45deg) translate(2px, -2px);
+}
+
+.submit:disabled .submitIcon {
+  animation: submit-sending 1s var(--ease-default) infinite;
+}
+
+@keyframes submit-sending {
+  0% {
+    opacity: 1;
+    transform: rotate(45deg) translate(0, 0);
+  }
+
+  60% {
+    opacity: 0;
+    transform: rotate(45deg) translate(8px, -8px);
+  }
+
+  61% {
+    opacity: 0;
+    transform: rotate(45deg) translate(-6px, 6px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: rotate(45deg) translate(0, 0);
+  }
 }
 
 /* Sits under the submit rather than above it: the notice belongs with the act of sending. */

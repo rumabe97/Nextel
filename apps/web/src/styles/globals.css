@@ -53,6 +53,88 @@ html {
   scroll-padding-top: calc(var(--header-height) + var(--space-06));
 }
 
+/* ── Page exit ─────────────────────────────────────────────────────────────
+   Set by RouteExit the moment a link to another page is clicked, cleared when that page
+   arrives. See that component for why this runs concurrently with the navigation rather than
+   delaying it.
+
+   The `transition` lives inside the attribute rule, not on `main`, and that is load-bearing:
+   when the attribute comes off, the transition goes with it, so `main` snaps straight back to
+   full opacity instead of fading up underneath the incoming page's own entrance. Two
+   overlapping fades read as a smear; one clean handover reads as a page turn.
+
+   0.55, not 0 — a page that blanks out looks like a failure. Dimming and lifting slightly
+   says "leaving" while the content is still legible the whole way. */
+html[data-leaving] main {
+  opacity: 0.55;
+  transform: translate3d(0, -0.5rem, 0);
+  transition:
+    opacity 0.2s var(--ease-exit),
+    transform 0.2s var(--ease-exit);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-leaving] main {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Press feedback ────────────────────────────────────────────────────────
+   Hover does not exist on a touchscreen, so on a phone every hover state written anywhere in
+   this app is dead weight — the only interactive feedback a finger ever gets is what happens
+   between touchstart and touchend. This is that feedback, applied once to every control on
+   the site rather than remembered per component.
+
+   `:active` fires on touch as well as mouse, and the scale is small enough to read as the
+   surface giving under the press rather than as the element resizing. 0.09s is under the
+   ~100ms at which a response stops feeling attached to the finger.
+
+   -webkit-tap-highlight-color removes the grey flash iOS and Android paint over tapped links,
+   which would otherwise fight this and looks like a rendering fault on a dark page. */
+a,
+button,
+[role='button'] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The doubled `:active` is not a typo. Component hover rules in this app are written as
+   `.link:hover` — one class plus one pseudo-class, 0-2-0 — which outranks a plain
+   `a:active` at 0-1-1. The press would then simply never appear on any element the pointer
+   was already hovering, which is every element a mouse ever presses. Repeating the
+   pseudo-class lifts this to 0-3-0 so the press wins over the hover it happens during,
+   without reaching for !important or naming each component here.
+
+   Inline text links — the ones inside privacy-policy paragraphs — are exempt for free:
+   transforms do not apply to non-replaced inline boxes, so a link in a sentence is untouched
+   while every button, pill and card stays covered. */
+a:active:active,
+button:not(:disabled):active:active,
+[role='button']:not([aria-disabled='true']):active:active {
+  transform: scale(0.97);
+  transition-duration: var(--duration-press);
+}
+
+/* Opt-out for full-bleed rows: a drawer item spanning the sheet has its edges against the
+   sheet's padding, and shrinking it detaches them visibly. Those press with a wash instead. */
+[data-press='none']:active:active {
+  transform: none;
+}
+
+/* ── Focus ─────────────────────────────────────────────────────────────────
+   Keyboard users get neither hover nor press. Every hover state in this app is paired with a
+   matching :focus-visible in its own stylesheet; this is the backstop that guarantees a
+   visible ring on anything that styles neither.
+
+   No `border-radius` here on purpose — outlines already follow the element's own corners, and
+   setting one would square off the pill-shaped CTAs the moment they took focus. */
+a:focus-visible,
+button:focus-visible,
+[role='button']:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
 /* Skip link — the header nav is long, and every page repeats it. */
 .skipLink {
   position: absolute;

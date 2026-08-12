@@ -1,5 +1,7 @@
 import styles from './NumberedList.module.css';
 
+import type { CSSProperties } from 'react';
+
 export interface NumberedListProps {
   className?: string;
   items: string[];
@@ -11,8 +13,10 @@ export interface NumberedListProps {
 export function NumberedList({ className, items }: NumberedListProps) {
   return (
     <ol className={[styles.list, className].filter(Boolean).join(' ')}>
-      {items.map(item => (
-        <li className={styles.item} key={item}>
+      {items.map((item, index) => (
+        // The index sequences each row's keyline — see the stylesheet. The numeral itself
+        // still comes from the CSS counter, so reordering the copy renumbers automatically.
+        <li className={styles.item} key={item} style={{ '--item-index': index } as CSSProperties}>
           <p className={styles.label}>{item}</p>
         </li>
       ))}

@@ -38,22 +38,10 @@
   list-style: none;
 }
 
-/* Fade up on entry, staggered — the same gesture SectionHeading and TaglineBand use, so the
-   strip arrives as part of the page rather than as a widget bolted onto it.
-   --client-step comes from the component: 0, 1, 2 … */
+/* The staggered fade-up is the shared Reveal's, applied to `.list` in the component — this
+   only has to make each tile a flex item so it fills its own grid cell. */
 .item {
   display: flex;
-  opacity: 0;
-  transform: translateY(0.5rem);
-  transition:
-    opacity var(--duration-slow) var(--ease-default),
-    transform var(--duration-slow) var(--ease-default);
-  transition-delay: calc(var(--client-step, 0) * 110ms);
-}
-
-.visible .item {
-  opacity: 1;
-  transform: translateY(0);
 }
 
 /* The tile is the click target and the affordance: a bare logo gives no signal that it is
