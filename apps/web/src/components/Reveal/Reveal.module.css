@@ -1,3 +1,16 @@
+/* Every reveal waits `--reveal-onset` before it starts. Publishing it here as the default
+   value of `--reveal-delay`, rather than adding it to each transition-delay, is what keeps
+   the rest of the page in step: the companion beats in Why, Services, NumberedList, About and
+   Contact are all written as `calc(var(--reveal-delay, 0ms) + …)`, and custom properties
+   inherit, so they pick the onset up through this one declaration. Adding it anywhere else
+   would have shifted the text without shifting the keyline drawn under it.
+
+   On `.root`, not on `.hidden`: an element that loaded above the fold never gets `.hidden`,
+   but the rules that read `--reveal-delay` are attached to its children all the same. */
+.root {
+  --reveal-delay: var(--reveal-onset, 0ms);
+}
+
 /* Only opacity and transform are ever animated here. Both are composited — the browser can
    run them without re-running layout or paint — whereas animating height, margin or top forces
    a reflow on every frame of every reveal on the page, which is what turns scroll animation
@@ -147,8 +160,19 @@
    390px screen is a much larger share of the width than the same value is at 1440. */
 @media (max-width: 48rem) {
   .root {
+    --reveal-shift: 1.5rem;
+    --reveal-stagger: 85ms;
+  }
+
+  /* Sideways travel is bounded in a way downward travel is not: the element has to start its
+     slide somewhere, and on a 390px screen the gutter it has to start in is only about 20px
+     wide. At 1.5rem the home page's `left` reveals began 4.4px past the edge of the screen,
+     where the body's `overflow-x: clip` would shear the first glyph for the length of the
+     fade. 1rem keeps the whole box on screen for every frame, with a few pixels to spare at
+     320 as well. Doubled class so this is not decided by which rule the bundler emits last. */
+  .root.left,
+  .root.right {
     --reveal-shift: 1rem;
-    --reveal-stagger: 70ms;
   }
 }
 
@@ -157,6 +181,16 @@
    would make the reveals snap rather than animate; this goes further and removes the offsets,
    so there is never a frame in which content sits displaced. */
 @media (prefers-reduced-motion: reduce) {
+  /* The shared reset in ui/styles/base collapses every duration but leaves delays alone, so
+     without this the onset and the stagger would survive as dead time: content sitting
+     invisible for up to a second and then popping in, which is a worse experience than the
+     animation it is replacing. Zeroing both here also collapses the companion beats, since
+     they are all calculated from these two variables. */
+  .root {
+    --reveal-onset: 0ms;
+    --reveal-stagger: 0ms;
+  }
+
   .hidden.fade,
   .hidden.up,
   .hidden.left,

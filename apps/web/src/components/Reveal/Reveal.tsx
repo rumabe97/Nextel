@@ -166,7 +166,10 @@ export function Reveal({ as: Tag = 'div', children, className, delay = 0, stagge
       // hashed by CSS Modules, so this is the only stable hook on the element.
       data-reveal=""
       ref={ref as never}
-      style={delay ? ({ ...style, '--reveal-delay': `calc(${delay} * var(--reveal-stagger))` } as CSSProperties) : style}
+      // Adds to the shared onset rather than replacing it — an inline custom property beats
+      // the stylesheet's `.root` declaration outright, so writing the bare stagger multiple
+      // here would silently opt this one element out of the beat every other reveal waits.
+      style={delay ? ({ ...style, '--reveal-delay': `calc(var(--reveal-onset, 0ms) + ${delay} * var(--reveal-stagger))` } as CSSProperties) : style}
     >
       {children}
     </Tag>

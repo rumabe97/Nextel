@@ -290,9 +290,13 @@
   transform: scaleX(0);
 }
 
+/* The +0.15s is what puts the rule a beat behind its own line, so it reads as underscoring
+   the statement rather than sliding in beside it. It has to be added to `--reveal-delay`, not
+   written as a bare 0.15s: that variable now carries the onset every reveal waits, and a flat
+   delay would start the rule at the same instant as the text it is meant to follow. */
 .statement[data-revealed]::before {
   transform: scaleX(1);
-  transition: transform 0.7s var(--ease-entrance) 0.15s;
+  transition: transform 0.7s var(--ease-entrance) calc(var(--reveal-delay, 0ms) + 0.15s);
 }
 
 @media (prefers-reduced-motion: reduce) {

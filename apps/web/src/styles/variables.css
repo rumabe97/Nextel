@@ -120,22 +120,45 @@
   --ease-exit: cubic-bezier(0.55, 0.06, 0.68, 0.19);
   --ease-emphasis: cubic-bezier(0.34, 1.06, 0.64, 1);
 
-  /* 0.55s sits in the 400–700ms band that reads as deliberate rather than either twitchy
-     or sluggish, and is the figure the current guidance converges on for entrance motion.
+  /* 0.9s for reveals. The usual 400–700ms guidance is written for state change — a menu
+     opening, a button responding — where the visitor is waiting on the result and every
+     extra frame is latency. A scroll reveal is the opposite case: nobody is waiting for it,
+     and it is competing with the scroll itself for attention. At 0.55s this was over before
+     it registered, because `--ease-entrance` spends roughly two thirds of its travel in the
+     first 30% of the duration: at a normal reading scroll the element had finished settling
+     while it was still down in the bottom quarter of the screen, and by the time the eye
+     reached it there was nothing left to see. 0.9s keeps it moving until it is around a
+     third of the way up, which is where it is actually being looked at.
      --duration-press is deliberately below the ~100ms threshold at which a button stops
      feeling directly connected to the finger. */
-  --duration-reveal: 0.55s;
+  --duration-reveal: 0.9s;
   --duration-press: 0.09s;
 
-  /* How far a revealing element travels. Small on purpose: past ~2rem the motion starts to
-     read as the layout being rebuilt rather than settling, and on a phone a large offset
-     means the element is still off-screen when the observer fires. The mobile step down
-     happens in globals.css, where the reveal rules live. */
-  --reveal-shift: 1.75rem;
+  /* A beat between the element crossing the trigger line and starting to move. It is what
+     separates the animation from the scroll that caused it: without it the motion begins on
+     the same frame the element appears, which reads as the page still laying itself out
+     rather than as content arriving. Kept short — this is time the content spends invisible
+     after entering the viewport, and past ~250ms that stops feeling like anticipation and
+     starts feeling like something failed to load.
 
-  /* Per-item delay inside a staggered group. 90ms is long enough to read as a sequence and
-     short enough that a six-card row has finished within half a second. */
-  --reveal-stagger: 90ms;
+     Reveal's `.root` publishes this as the default `--reveal-delay`, so it is inherited by
+     the per-element beats that key off that variable (the keylines on Why and Services, the
+     numerals in NumberedList, the mission rules on About) and every one of them stays in
+     step with the text it belongs to without naming this token. */
+  --reveal-onset: 0.15s;
+
+  /* How far a revealing element travels. Still small: past ~3rem the motion reads as the
+     layout being rebuilt rather than settling, and on a phone a large offset means the
+     element is still off-screen when the observer fires. But 1.75rem was under-reading at
+     this duration — the distance is the other half of what makes the motion legible, and
+     28px of drift across nearly a second is slow enough to look like a rendering lag rather
+     than a deliberate arrival. The mobile step down happens in Reveal.module.css. */
+  --reveal-shift: 2.5rem;
+
+  /* Per-item delay inside a staggered group. Long enough to read as a sequence rather than
+     as one block with soft edges, short enough that a six-card row is done inside a second
+     of its first item starting. */
+  --reveal-stagger: 110ms;
 
   /* Signature gradients, reused by the footer, hero overlays and card washes. */
   --gradient-brand: linear-gradient(135deg, #2793c1 0%, #12455b 100%);
